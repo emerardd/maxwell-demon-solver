@@ -1,0 +1,147 @@
+[1/25] w1-A (f11ee95d) ...
+w1-A f11ee95d OK             0.3s  69 chars
+[2/25] w1-B (aa258f4c) ...
+w1-B aa258f4c OK             0.2s  41 chars
+[3/25] w1-C (900ca6ab) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 8 at (11, 3), route [(11, 3), (11, 4), (12, 4), (13, 4), (14, 4), (15, 4), (16, 4), (17, 4), (18, 4), (19, 4), (20, 4), (20, 3)], demon on [(11, 2), (11, 3), (10, 4), (11, 4), (11, 4), (12, 4), (12, 4), (13, 4), (13, 4), (14, 4), (14, 4), (15, 4), (15, 4), (16, 4), (16, 4), (17, 4), (17, 4), (18, 4), (18, 4), (19, 4), (20, 5), (20, 4)]
+      hazard: hot group (11,) on [(9, 4)], 1 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w1-C 900ca6ab TIMEOUT       90.5s  
+[4/25] w1-D (42db5cae) ...
+w1-D 42db5cae OK             0.1s  37 chars
+[5/25] w1-E (b25aa619) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 3 at (6, 2), route [(6, 2), (6, 3), (6, 4), (6, 5), (7, 5), (7, 6), (7, 7), (8, 7), (9, 7)], demon on [(6, 1), (6, 2), (6, 2), (6, 3), (6, 3), (6, 4), (5, 5), (6, 5), (7, 4), (7, 5), (7, 5), (7, 6), (6, 7), (7, 7), (7, 7), (8, 7)]
+      hazard: hot group (6, 7, 8, 9, 12) on [(6, 4), (7, 4), (7, 5), (7, 6), (7, 7)], 5 units of heat to cancel
+      carrier blocks: [1, 2, 4, 5, 10]
+      no layout and order led to a solution
+w1-E b25aa619 TIMEOUT       90.7s  
+[6/25] w1-F (6e66dc79) ...
+w1-F 6e66dc79 OK            10.2s  87 chars
+[7/25] w1-G (85ad3cb0) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w1-G 85ad3cb0 TIMEOUT       90.5s  
+[8/25] w2-A (029cc92d) ...
+w2-A 029cc92d OK             1.0s  36 chars
+[9/25] w2-B (8a3ae7ac) ...
+w2-B 8a3ae7ac OK            12.8s  92 chars
+[10/25] w2-C (872bef8e) ...
+w2-C 872bef8e OK            32.5s  61 chars
+[11/25] w2-D (74d1628e) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 7 at (8, 7), route [(8, 7), (8, 6), (8, 5), (8, 4), (9, 4), (10, 4), (10, 3), (10, 2)], demon on [(8, 8), (8, 7), (8, 7), (8, 6), (8, 6), (8, 5), (7, 4), (8, 4), (8, 4), (9, 4), (10, 5), (10, 4), (10, 4), (10, 3)]
+      hazard: hot group (7,) on [(8, 7)], 1 units of heat to cancel
+      carrier blocks: [4, 5, 6, 8]
+      no layout and order led to a solution
+w2-D 74d1628e TIMEOUT       90.8s  
+[12/25] w2-E (a07a480b) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 3 at (6, 3), route [(6, 3), (5, 3), (5, 4), (5, 5)], demon on [(7, 3), (6, 3), (5, 2), (5, 3), (5, 3), (5, 4)]
+      hazard: hot group (3,) on [(6, 3)], 1 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w2-E a07a480b TIMEOUT       90.6s  
+[13/25] w2-F (954fb031) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w2-F 954fb031 TIMEOUT       90.6s  
+[14/25] w2-G (548490f7) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w2-G 548490f7 TIMEOUT       90.8s  
+[15/25] w2-H (4b9dfde1) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 9 at (2, 4), route [(2, 4), (3, 4), (4, 4), (5, 4), (6, 4), (7, 4), (8, 4), (9, 4)], demon on [(1, 4), (2, 4), (2, 4), (3, 4), (3, 4), (4, 4), (4, 4), (5, 4), (5, 4), (6, 4), (6, 4), (7, 4), (7, 4), (8, 4)]
+      no hazard on the final pushes: an ordinary search should do
+w2-H 4b9dfde1 TIMEOUT       90.5s  
+[16/25] w2-I (5fe1b337) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 2 at (8, 2), route [(8, 2), (8, 3)], demon on [(8, 1), (8, 2)]
+      hazard: hot group (2,) on [(8, 2)], 1 units of heat to cancel
+      carrier blocks: [5, 6, 8, 10]
+      no layout and order led to a solution
+w2-I 5fe1b337 TIMEOUT       90.5s  
+[17/25] w2-J (0813d109) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 2 at (8, 3), route [(8, 3), (7, 3), (7, 4), (7, 5), (7, 6), (7, 7), (7, 8), (8, 8)], demon on [(9, 3), (8, 3), (7, 2), (7, 3), (7, 3), (7, 4), (7, 4), (7, 5), (7, 5), (7, 6), (7, 6), (7, 7), (6, 8), (7, 8)]
+      hazard: hot group (7,) on [(8, 5)], 1 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w2-J 0813d109 TIMEOUT       90.6s  
+[18/25] w3-A (911f31ef) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 1 at (4, 2), route [(4, 2), (5, 2), (6, 2), (7, 2), (8, 2), (9, 2), (10, 2), (11, 2), (12, 2), (13, 2), (14, 2), (15, 2), (16, 2), (16, 3), (16, 4), (16, 5), (16, 6), (16, 7)], demon on [(3, 2), (4, 2), (4, 2), (5, 2), (5, 2), (6, 2), (6, 2), (7, 2), (7, 2), (8, 2), (8, 2), (9, 2), (9, 2), (10, 2), (10, 2), (11, 2), (11, 2), (12, 2), (12, 2), (13, 2), (13, 2), (14, 2), (14, 2), (15, 2), (16, 1), (16, 2), (16, 2), (16, 3), (16, 3), (16, 4), (16, 4), (16, 5), (16, 5), (16, 6)]
+      hazard: hot group (3, 5, 6, 7, 10) on [(7, 4), (8, 3), (8, 4), (8, 5), (9, 4)], 5 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w3-A 911f31ef TIMEOUT       90.3s  
+[19/25] w3-B (83c0af40) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 1 at (4, 2), route [(4, 2), (5, 2), (6, 2), (7, 2), (8, 2), (9, 2), (10, 2), (11, 2), (12, 2), (13, 2), (14, 2), (15, 2), (15, 3), (15, 4), (15, 5), (15, 6), (15, 7)], demon on [(3, 2), (4, 2), (4, 2), (5, 2), (5, 2), (6, 2), (6, 2), (7, 2), (7, 2), (8, 2), (8, 2), (9, 2), (9, 2), (10, 2), (10, 2), (11, 2), (11, 2), (12, 2), (12, 2), (13, 2), (13, 2), (14, 2), (15, 1), (15, 2), (15, 2), (15, 3), (15, 3), (15, 4), (15, 4), (15, 5), (15, 5), (15, 6)]
+      hazard: hot group (3, 6, 7, 8, 12) on [(7, 4), (8, 3), (8, 4), (8, 5), (9, 4)], 5 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w3-B 83c0af40 TIMEOUT       90.4s  
+[20/25] w3-C (c86cc4fc) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w3-C c86cc4fc TIMEOUT       90.5s  
+[21/25] w3-D (ee804cde) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w3-D ee804cde TIMEOUT       90.4s  
+[22/25] w3-E (3f53d467) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w3-E 3f53d467 TIMEOUT       90.2s  
+[23/25] w3-F (8c6934a2) ...
+      solve_any: TIMEOUT, trying derive.py
+      candidate block 7 at (5, 5), route [(5, 5), (6, 5), (7, 5), (8, 5), (9, 5), (10, 5), (11, 5), (12, 5), (13, 5)], demon on [(4, 5), (5, 5), (5, 5), (6, 5), (6, 5), (7, 5), (7, 5), (8, 5), (8, 5), (9, 5), (9, 5), (10, 5), (10, 5), (11, 5), (11, 5), (12, 5)]
+      hazard: hot group (6,) on [(3, 5)], 1 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w3-F 8c6934a2 TIMEOUT       90.3s  
+[24/25] w3-G (f35c1a7b) ...
+      solve_any: TIMEOUT, trying derive.py
+      no single-cell candidate block can reach the goal
+w3-G f35c1a7b TIMEOUT       90.5s  
+[25/25] w3-H (b35a381c) ...
+      solve_any: UNSOLVABLE, trying derive.py
+      candidate block 3 at (7, 3), route [(7, 3), (7, 2)], demon on [(7, 4), (7, 3)]
+      hazard: hot group (3,) on [(7, 3)], 1 units of heat to cancel
+      carrier blocks: []
+      no layout and order led to a solution
+w3-H b35a381c UNSOLVABLE     0.0s  
+
+summary:
+  w1: 4/7 solved
+    A f11ee95d OK             0.3s  69 chars
+    B aa258f4c OK             0.2s  41 chars
+    C 900ca6ab TIMEOUT       90.5s  
+    D 42db5cae OK             0.1s  37 chars
+    E b25aa619 TIMEOUT       90.7s  
+    F 6e66dc79 OK            10.2s  87 chars
+    G 85ad3cb0 TIMEOUT       90.5s  
+  w2: 3/10 solved
+    A 029cc92d OK             1.0s  36 chars
+    B 8a3ae7ac OK            12.8s  92 chars
+    C 872bef8e OK            32.5s  61 chars
+    D 74d1628e TIMEOUT       90.8s  
+    E a07a480b TIMEOUT       90.6s  
+    F 954fb031 TIMEOUT       90.6s  
+    G 548490f7 TIMEOUT       90.8s  
+    H 4b9dfde1 TIMEOUT       90.5s  
+    I 5fe1b337 TIMEOUT       90.5s  
+    J 0813d109 TIMEOUT       90.6s  
+  w3: 0/8 solved
+    A 911f31ef TIMEOUT       90.3s  
+    B 83c0af40 TIMEOUT       90.4s  
+    C c86cc4fc TIMEOUT       90.5s  
+    D ee804cde TIMEOUT       90.4s  
+    E 3f53d467 TIMEOUT       90.2s  
+    F 8c6934a2 TIMEOUT       90.3s  
+    G f35c1a7b TIMEOUT       90.5s  
+    H b35a381c UNSOLVABLE     0.0s  
