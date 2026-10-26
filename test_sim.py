@@ -628,6 +628,24 @@ class Transparent(unittest.TestCase):  # w2/empty-1, empty-2
         self.assertEqual(temp_at(m, s, (4, 1)), HOT)  # it passes heat, it does not store it
 
 
+class SubGoals(unittest.TestCase):
+    def test_goal_heuristic_and_start_hooks(self):
+        levels = {'P': build(['#######',
+                              '#@o..*#',
+                              '#######'], lid='P')}
+        sv = solver.Solver(levels)
+        m = sv.model('P', frozenset(), NEUTRAL)
+        bi = next(i for i, b in enumerate(m.bodies) if not b.fixed)
+
+        def there(h):  # sub-goal: the block on (3,1)
+            return bool(h.path) and h.top.pos[bi] == (3, 1)
+        plan, _ = sv.solve('P', goal=there, heuristic=lambda h: 0)
+        self.assertEqual(sv.last_end.top.pos[bi], (3, 1))
+        rest, solved = sv.solve('P', start=sv.last_end)  # on from there to the real goal
+        self.assertIn('P', solved)
+        self.assertTrue(solver.replay(sv, 'P', plan + rest)[0])
+
+
 class Symmetry(unittest.TestCase):
     def test_swapped_identical_blocks_give_the_same_key(self):
         m = sim.Model(build(['#######',

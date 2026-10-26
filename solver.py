@@ -38,34 +38,48 @@ class Solver:
     def model(self, lid, solved, t_out):
         return self.world.model(lid, solved, t_out)
 
-    def solve(self, lid, solved=frozenset(), t_out=sim.NEUTRAL, scope=None):
+    def solve(self, lid, solved=frozenset(), t_out=sim.NEUTRAL, scope=None,
+              start=None, goal=None, heuristic=None):
         """Return (plan, solved set afterwards) or None if the level cannot be solved.
+        The world state the plan ends in is left in self.last_end.
 
         scope: start in this level instead (an ancestor of lid on its real chain) and succeed
         once lid is solved; for levels only ever met inside another one.
+        Sub-goals: start (a world.HState to begin from instead of the level's start), goal
+        (HState -> bool, replaces "lid is solved") and heuristic (HState -> number, replaces
+        the built-in one; INF prunes).
         Iterative deepening on the path of entered levels: nested and self-referring levels
         make the state space grow quickly with depth, and most solutions stay shallow."""
         deadline = time.monotonic() + self.time_budget if self.time_budget else float('inf')
         depths = sorted({d for d in (2, 3, 4) if d < self.max_depth} | {self.max_depth})
         self.target = lid
+        hooks = (start, goal, heuristic)
         try:
             for depth in depths:
                 self.world.max_depth, self.world.depth_hit = depth, False
-                result = self._search(lid, solved, t_out, deadline, scope or lid)
+                result = self._search(lid, solved, t_out, deadline, scope or lid, hooks)
                 if result is not None or not self.world.depth_hit:
                     return result  # found, or the limit never cut anything off
             return None
         finally:
             self.world.max_depth = self.max_depth
 
-    def _search(self, lid, solved, t_out, deadline, root):
+    def _search(self, lid, solved, t_out, deadline, root, hooks=(None, None, None)):
         w = self.world
-        h0 = w.start(root, solved, t_out)
+        start_h, goal, heuristic = hooks
+        h0 = start_h or w.start(root, solved, t_out)
         m0 = w.current(h0)
-        if not m0.starts:
-            return None
-        if root == lid and m0.won(h0.top):
-            return [], solved | {lid}
+        self.last_end, self.last_search = h0, ({}, {}, {})
+        if goal is None:
+            def goal(h):
+                return w.finished(h, lid)
+            if not m0.starts:
+                return None
+            if start_h is None and root == lid and m0.won(h0.top):
+                return [], solved | {lid}
+        elif goal(h0):
+            return [], h0.solved
+        h_of = heuristic or self._h
         # States are deduplicated by their canonical key; the actual state reached first is
         # kept so plans walk from where the demon really stands. settled[key]: the actual state
         # came out of a heat phase, so it is in heat equilibrium (start, enter and exit states
@@ -74,7 +88,7 @@ class Solver:
         prev, actual, depth, settled = {start: None}, {start: h0}, {start: 0}, {start: False}
         self.last_search = (prev, actual, depth)  # kept for analysis after a timeout
         tie = count()
-        hv = self._h(h0)
+        hv = h_of(h0)
         if hv == prune.INF:
             return None
         queue = [(self.h_weight * hv, 0, next(tie), start)]
@@ -84,10 +98,11 @@ class Solver:
             _, _, _, node = heapq.heappop(queue)
             g = depth[node] + 1
             for step, nxt, is_settled in self._successors(actual[node], settled[node]):
-                if w.finished(nxt, lid):
+                if goal(nxt):
                     prev[('done',)] = (node, step)
+                    self.last_end = nxt
                     return self._plan(prev, ('done',)), nxt.solved
-                hv = self._h(nxt)
+                hv = h_of(nxt)
                 if hv == prune.INF:
                     self.pruned += 1
                     continue

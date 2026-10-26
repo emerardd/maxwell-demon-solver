@@ -1,0 +1,29 @@
+blocks:
+   1 at (1, 1) C faces(LDRU) PPPP
+   2 at (4, 3) n faces(LDRU) IPPI <- target ((7, 2), True)
+   3 at (5, 3) n faces(LDRU) PPII <- target ((8, 3), True)
+   4 at (11, 3) n faces(LDRU) IIII
+   5 at (4, 4) n faces(LDRU) IIPP <- target ((7, 3), True)
+   6 at (5, 4) n faces(LDRU) PIIP <- target ((8, 2), True)
+   7 at (8, 5) H faces(LDRU) PPSP
+   8 at (9, 5) H faces(LDRU) SPSP
+   9 at (10, 5) H faces(LDRU) SPSP
+  10 at (11, 5) H faces(LDRU) SPPP
+      ... 20,000 states, 6,122 queued, depth 28
+      ... 40,000 states, 9,845 queued, depth 33
+      ... 60,000 states, 12,402 queued, depth 33
+      ... 80,000 states, 10,676 queued, depth 40
+      ... 100,000 states, 14,891 queued, depth 33
+      ... 120,000 states, 17,425 queued, depth 40
+      ... 140,000 states, 15,595 queued, depth 16
+      ... 160,000 states, 5,132 queued, depth 23
+Traceback (most recent call last):
+  File "subgoal.py", line 103, in <module>
+    r1 = sv.solve(lid, goal=reached, heuristic=guide)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "solver.py", line 60, in solve
+    result = self._search(lid, solved, t_out, deadline, scope or lid, hooks)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "solver.py", line 97, in _search
+    raise TimeoutError(f'time budget used up in {lid} after {len(prev)} states')
+TimeoutError: time budget used up in 4b1153be after 161023 states
