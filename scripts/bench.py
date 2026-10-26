@@ -12,9 +12,15 @@ CONFIGS = [('A admissible greedy', 'admissible', 50),
            ('B informed  w=3   ', 'informed', 3),
            ('C informed  greedy', 'informed', 50)]
 
-levels = mxw.load_world(sys.argv[1])[0]
-budget = float(sys.argv[2])
-for arg in sys.argv[3:]:
+args = sys.argv[1:]
+if '--configs' in args:  # e.g. --configs B,C to run only those
+    i = args.index('--configs')
+    keep = set(args[i + 1].split(','))
+    CONFIGS = [c for c in CONFIGS if c[0][0] in keep]
+    del args[i:i + 2]
+levels = mxw.load_world(args[0])[0]
+budget = float(args[1])
+for arg in args[2:]:
     lid, _, scope = arg.partition('@')
     for name, heuristic, weight in CONFIGS:
         sv = solver.Solver(levels, time_budget=budget, heuristic=heuristic, h_weight=weight)

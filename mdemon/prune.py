@@ -174,7 +174,9 @@ class Pruner:
           - a cost for every other movable group standing on that route (move it first);
           - for every hot body that would touch the demon at a push position on the route
             (the candidate itself included), a cost plus the walking distance from the
-            nearest cold block to that hot body, so that bringing cold closer is rewarded.
+            nearest cold block to that hot body, so that bringing cold closer is rewarded;
+            for a hot candidate, bringing a glove (a block with an insulated face) behind it
+            counts as an alternative to cooling it.
         INF only where h() says the state is dead."""
         t = self.tables(m)
         occ = m.occupancy(s)
@@ -183,11 +185,14 @@ class Pruner:
         best = INF
         for d, table, origin, shape, members in self._candidates(m, s, t):
             blockers, hazards, o = set(), set(), origin
+            first_behind = None  # where the demon stands for the first push
             while table.get(o, 0) > 0:
                 nxt = next((n for n in ((o[0] + dx, o[1] + dy) for dx, dy in DIRS)
                             if table.get(n) == table[o] - 1), None)
                 if nxt is None:
                     break
+                if first_behind is None:
+                    first_behind = (2 * o[0] - nxt[0], 2 * o[1] - nxt[1])
                 for cx, cy in shape:
                     hit = occ.get((nxt[0] + cx, nxt[1] + cy))
                     if hit is not None and hit[0] not in members and not m.bodies[hit[0]].fixed:
@@ -205,11 +210,36 @@ class Pruner:
                 if hot_group in done:
                     continue
                 done.add(hot_group)
-                v += self.HAZARD + self._cooling(m, s, t, hot_group, carriers)
+                cost = self._cooling(m, s, t, hot_group, carriers)
+                if hot_group == members and first_behind is not None:
+                    # the candidate itself is hot: it can also be pushed through a glove
+                    cost = min(cost, self._glove(m, s, t, groups, members, first_behind))
+                v += self.HAZARD + cost
             if v < best:
                 best = v
         if best == INF and t.cap < INF:
             return 20  # only a level block could help: no guidance, but not dead
+        return best
+
+    GLOVE = 2      # setting up a glove: a block with an insulated face pushed in between
+
+    def _glove(self, m, s, t, groups, members, behind):
+        """Cost of pushing a hot candidate through a glove: the walking distance from the
+        nearest movable, not hot block that has an insulated face to the cell the demon would
+        push the candidate from (the glove goes there, the demon pushes the glove)."""
+        best = INF
+        for rep, (gm, immovable) in groups.items():
+            if immovable or gm == members:
+                continue
+            bodies = [j for j in gm if s.pos[j] is not None]
+            if not bodies or any(s.temp[j] == HOT for j in bodies):
+                continue
+            if not any(f == INSULATED for j in bodies for fs in m.bodies[j].faces for f in fs):
+                continue
+            for c in self._cells(m, s, bodies):
+                dist = t.walk(m, c).get(behind)
+                if dist is not None and dist + self.GLOVE < best:
+                    best = dist + self.GLOVE
         return best
 
     @staticmethod
