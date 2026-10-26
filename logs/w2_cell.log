@@ -1,0 +1,251 @@
+[1/60] normal 215c0725 ...
+normal 215c0725 OK           0.1s  22 chars  RRDRRRURULDDLLLURRDRUR
+[2/60] hint 225c6ca1 ...
+hint   225c6ca1 OK           0.0s  18 chars  RUURDLDDRURRRLUURD
+[3/60] normal 13b17116 ...
+normal 13b17116 OK           6.5s  33 chars  RURRDLLUUURDLDLLURRURDDLLLDRDRRRR
+[4/60] hint 0398558e ...
+hint   0398558e OK           0.0s  9 chars  RURDLDRRR
+[5/60] normal e80e6019 ...
+normal e80e6019 OK           5.8s  36 chars  RRLLLUURURDDLDDRRRUDLLLURRURRRRRRRDD
+[6/60] hint f0b9a001 ...
+hint   f0b9a001 OK           0.0s  13 chars  RRRRURDLDRURD
+[7/60] normal 68241505 ...
+      ... 68241505: 20,000 states, 14,563 queued, depth 5
+      optimal A* timed out, retrying with weighted A*
+      ... 68241505: 20,000 states, 9,946 queued, depth 10
+      ... 68241505: 40,000 states, 18,230 queued, depth 11
+      ... 68241505: 60,000 states, 29,019 queued, depth 10
+normal 68241505 TIMEOUT     90.2s  time budget used up in 68241505 after 62782 states
+[8/60] hint 179d924b ...
+hint   179d924b OK           0.4s  30 chars  DRRLUURRURDLLDDDRUULUURDDLDRRR
+[9/60] normal 0a113c1f ...
+      ... 0a113c1f: 20,000 states, 10,729 queued, depth 9
+      optimal A* timed out, retrying with weighted A*
+      ... 0a113c1f: 20,000 states, 9,853 queued, depth 12
+      ... 0a113c1f: 40,000 states, 18,750 queued, depth 13
+      ... 0a113c1f: 60,000 states, 28,402 queued, depth 14
+normal 0a113c1f TIMEOUT     90.2s  time budget used up in 0a113c1f after 79923 states
+[10/60] hint ebe70e73 ...
+hint   ebe70e73 OK           0.0s  43 chars  RRRRDLDRLUULLDDRLUURRDRDDRRULDLUUDDLLLURDRU
+[11/60] normal d07f4968 ...
+normal d07f4968 ERROR        0.0s  Piston at (6, 7) in c8817e32
+[12/60] hint 17a16888 ...
+hint   17a16888 OK           0.0s  11 chars  RURDDRDRRRU
+[13/60] normal f4df7bdf ...
+      ... f4df7bdf: 20,000 states, 7,104 queued, depth 9
+      ... f4df7bdf: 40,000 states, 1,128 queued, depth 29
+      optimal A* timed out, retrying with weighted A*
+      ... f4df7bdf: 20,000 states, 3,913 queued, depth 9
+      ... f4df7bdf: 40,000 states, 7,266 queued, depth 11
+      ... f4df7bdf: 60,000 states, 7,085 queued, depth 44
+      ... f4df7bdf: 80,000 states, 9,634 queued, depth 46
+      ... f4df7bdf: 100,000 states, 12,313 queued, depth 54
+normal f4df7bdf TIMEOUT     90.2s  time budget used up in f4df7bdf after 108606 states
+[14/60] hint df02ce93 ...
+hint   df02ce93 OK           0.1s  47 chars  RURDDRDDLLDLLURRDRUURULRUULDDDDUUULLDRURDDRDLLL
+[15/60] normal 621419ea ...
+normal 621419ea OK           0.0s  41 chars  RRDRRDRUUDRULLUURDLDDLLUURLDDRRURUULDDRDL
+[16/60] hint 234f8893 ...
+hint   234f8893 OK           0.0s  9 chars  RUUDRDRRR
+[17/60] normal 1435f49f ...
+normal 1435f49f OK           0.4s  102 chars  RURRRRURRDLLLLDLDLLURRLURDDRRRLLLUURRRURRDLLLLLDDRULURRRRRLLLLLDLLURRRRRURRDLLLLDDRRDRRULL
+[18/60] hint 5272ab97 ...
+hint   5272ab97 OK           0.2s  32 chars  UUURDRDRDLLLDLURULDRRRULDLLURRRR
+[19/60] normal 192f2ce1 ...
+normal 192f2ce1 OK           1.9s  29 chars  RRRRULRRLLDLURULDDLLUUDRURRUR
+[20/60] hint 28f2d0c3 ...
+hint   28f2d0c3 OK           0.4s  18 chars  RRURDLLDDRRLURUURU
+[21/60] normal 68ae7592 ...
+normal 68ae7592 OK           2.6s  62 chars  LRRRRURDLLLDRRRRRURRDLLLLULLLURDRLDRRRRURRRUULDRDLLRDLUULRDDLU
+[22/60] hint c126c493 ...
+hint   c126c493 OK           0.0s  33 chars  RRURDDLULLDDRRRUUURRRDDLDLLLLLULD
+[23/60] normal 00ab1e70 ...
+      ... 00ab1e70: 20,000 states, 2,327 queued, depth 15
+      ... 00ab1e70: 40,000 states, 807 queued, depth 32
+normal 00ab1e70 OK          26.3s  91 chars  LDDLULURRRRURRRRDDDRRULDLURRULLLLULLLDDLLLURRURDRURRRRDDDLURRRULLLLULLLDDLLLURURDDLDRURRUR
+[24/60] hint aa7076fe ...
+hint   aa7076fe OK           0.0s  28 chars  LDDRURRUURRDLLLULDLDRRRURRDR
+[25/60] normal e25aeb7a ...
+      ... e25aeb7a: 20,000 states, 12,187 queued, depth 9
+      ... e25aeb7a: 40,000 states, 22,561 queued, depth 10
+      optimal A* timed out, retrying with weighted A*
+      ... e25aeb7a: 20,000 states, 6,471 queued, depth 12
+      ... e25aeb7a: 40,000 states, 14,897 queued, depth 10
+normal e25aeb7a TIMEOUT     90.2s  time budget used up in e25aeb7a after 58018 states
+[26/60] hint 8b4b138d ...
+hint   8b4b138d OK           0.0s  23 chars  LLDDRRRRUUURRDULLDDDRRR
+[27/60] normal 3b80a1f9 ...
+      ... 3b80a1f9: 20,000 states, 7,875 queued, depth 16
+      ... 3b80a1f9: 40,000 states, 15,254 queued, depth 16
+      ... 3b80a1f9: 60,000 states, 22,294 queued, depth 17
+      ... 3b80a1f9: 80,000 states, 28,518 queued, depth 19
+      optimal A* timed out, retrying with weighted A*
+      ... 3b80a1f9: 20,000 states, 7,421 queued, depth 17
+      ... 3b80a1f9: 40,000 states, 14,227 queued, depth 22
+      ... 3b80a1f9: 60,000 states, 21,234 queued, depth 14
+normal 3b80a1f9 OK~         53.6s  22 chars  LDLUURRRRDDLDUUULDDDRR
+[28/60] hint 7dc8d0b7 ...
+hint   7dc8d0b7 OK           0.0s  4 chars  RRDD
+[29/60] hint a7674929 ...
+hint   a7674929 UNSOLVABLE   0.0s  
+[30/60] normal 4e6fb743 ...
+      ... 4e6fb743: 20,000 states, 1,278 queued, depth 18
+normal 4e6fb743 OK          18.0s  61 chars  RUURRRRRRULULDRDLLLLUULDLDDDRULURUURRRDLULLDRRRRRURRDDUULDRDD
+[31/60] hint 3ab049f0 ...
+hint   3ab049f0 OK           0.3s  41 chars  LULDRDRRRRULLLLULDLDDDRULURRRRUURDDRDDDLL
+[32/60] normal a679896b ...
+normal a679896b OK           0.3s  22 chars  DRRLURRRRRDRRRURRRRUUR
+[33/60] hint be98d49b ...
+hint   be98d49b OK           0.5s  39 chars  DRRRRLURRRRDRRULLLLLLLLLLLDRRRUULLLUDDL
+[34/60] normal ce9ce823 ...
+      optimal A* timed out, retrying with weighted A*
+      ... ce9ce823: 20,000 states, 16,484 queued, depth 5
+normal ce9ce823 TIMEOUT     90.1s  time budget used up in ce9ce823 after 35558 states
+[35/60] hint 76314e4f ...
+hint   76314e4f OK          20.9s  26 chars  LLUURRURDDLDRRRRURRURLUUUR
+[36/60] normal bd8dabb6 ...
+      ... bd8dabb6: 20,000 states, 16,234 queued, depth 5
+      optimal A* timed out, retrying with weighted A*
+      ... bd8dabb6: 20,000 states, 16,234 queued, depth 5
+      ... bd8dabb6: 40,000 states, 31,316 queued, depth 5
+      ... bd8dabb6: 60,000 states, 46,015 queued, depth 6
+normal bd8dabb6 TIMEOUT     90.2s  time budget used up in bd8dabb6 after 63404 states
+[37/60] hint 4ef69548 ...
+hint   4ef69548 OK           4.5s  26 chars  RRDRULURDDRRRUULDRDLUUUULL
+[38/60] normal c4fc4564 ...
+      ... c4fc4564: 20,000 states, 9,354 queued, depth 14
+      ... c4fc4564: 40,000 states, 18,245 queued, depth 15
+      ... c4fc4564: 60,000 states, 27,029 queued, depth 16
+      ... c4fc4564: 80,000 states, 35,526 queued, depth 16
+      ... c4fc4564: 100,000 states, 45,097 queued, depth 17
+      optimal A* timed out, retrying with weighted A*
+      ... c4fc4564: 20,000 states, 9,354 queued, depth 14
+      ... c4fc4564: 40,000 states, 18,245 queued, depth 15
+      ... c4fc4564: 60,000 states, 27,029 queued, depth 16
+      ... c4fc4564: 80,000 states, 35,526 queued, depth 16
+      ... c4fc4564: 100,000 states, 45,097 queued, depth 17
+      ... c4fc4564: 120,000 states, 52,470 queued, depth 17
+      ... c4fc4564: 140,000 states, 59,973 queued, depth 17
+      ... c4fc4564: 160,000 states, 68,616 queued, depth 17
+      ... c4fc4564: 180,000 states, 77,363 queued, depth 18
+normal c4fc4564 TIMEOUT     90.6s  time budget used up in c4fc4564 after 197554 states
+[39/60] hint 58e14d99 ...
+      ... 58e14d99: 20,000 states, 5,579 queued, depth 20
+      ... 58e14d99: 40,000 states, 10,087 queued, depth 21
+hint   58e14d99 OK          13.9s  27 chars  DDDRLUUUUURDRLDRLDDRURLURRR
+[40/60] normal 41d7e33b ...
+      ... 41d7e33b: 20,000 states, 16,681 queued, depth 5
+      ... 41d7e33b: 40,000 states, 32,749 queued, depth 6
+      optimal A* timed out, retrying with weighted A*
+      ... 41d7e33b: 20,000 states, 16,681 queued, depth 5
+      ... 41d7e33b: 40,000 states, 32,749 queued, depth 6
+      ... 41d7e33b: 60,000 states, 48,460 queued, depth 6
+      ... 41d7e33b: 80,000 states, 64,118 queued, depth 6
+normal 41d7e33b TIMEOUT     90.2s  time budget used up in 41d7e33b after 80701 states
+[41/60] hint b6c54242 ...
+hint   b6c54242 OK           0.1s  59 chars  RRRRRDDDRRULDLUUULURURDDURRDLULDLDRLDDRULUURURRDLULDDLDLDRR
+[42/60] extra 029cc92d ...
+extra  029cc92d OK           3.8s  36 chars  LUURRDRRDLDLUULUURRRDULLLDRURDDLDDRU
+[43/60] extra 8a3ae7ac ...
+extra  8a3ae7ac OK          15.0s  84 chars  RRRDLRRRULLLLLDDLDDRUURRUURRDDDLURULDLLUDLLURURRURDLDULLDDRULURRRRURDDDLUULLDRDDRRRR
+[44/60] extra 872bef8e ...
+extra  872bef8e OK           2.8s  61 chars  DRRDDRRRULDLLLLLUURRRDULLLDDRRRRURDLLULULUUURDDLDRLLDRRURDLDR
+[45/60] extra 74d1628e ...
+      ... 74d1628e: 20,000 states, 14,395 queued, depth 5
+      ... 74d1628e: 40,000 states, 27,578 queued, depth 7
+      optimal A* timed out, retrying with weighted A*
+      ... 74d1628e: 20,000 states, 14,596 queued, depth 11
+      ... 74d1628e: 40,000 states, 28,387 queued, depth 12
+      ... 74d1628e: 60,000 states, 42,328 queued, depth 13
+      ... 74d1628e: 80,000 states, 54,173 queued, depth 17
+      ... 74d1628e: 100,000 states, 68,254 queued, depth 14
+extra  74d1628e TIMEOUT     90.4s  time budget used up in 74d1628e after 103526 states
+[46/60] extra a07a480b ...
+      ... a07a480b: 20,000 states, 9,409 queued, depth 10
+      optimal A* timed out, retrying with weighted A*
+      ... a07a480b: 20,000 states, 8,804 queued, depth 10
+      ... a07a480b: 40,000 states, 11,763 queued, depth 12
+extra  a07a480b TIMEOUT     90.1s  time budget used up in a07a480b after 44704 states
+[47/60] extra 954fb031 ...
+      ... 954fb031: 20,000 states, 11,830 queued, depth 8
+      ... 954fb031: 40,000 states, 22,876 queued, depth 9
+      optimal A* timed out, retrying with weighted A*
+      ... 954fb031: 20,000 states, 11,244 queued, depth 6
+      ... 954fb031: 40,000 states, 22,466 queued, depth 10
+      ... 954fb031: 60,000 states, 33,199 queued, depth 11
+      ... 954fb031: 80,000 states, 43,249 queued, depth 14
+      ... 954fb031: 100,000 states, 53,421 queued, depth 11
+extra  954fb031 TIMEOUT     90.2s  time budget used up in 954fb031 after 102172 states
+[48/60] extra 548490f7 ...
+      ... 548490f7: 20,000 states, 6,412 queued, depth 11
+      optimal A* timed out, retrying with weighted A*
+      ... 548490f7: 20,000 states, 7,255 queued, depth 10
+      ... 548490f7: 40,000 states, 12,650 queued, depth 16
+      ... 548490f7: 60,000 states, 17,712 queued, depth 14
+extra  548490f7 TIMEOUT     90.3s  time budget used up in 548490f7 after 70342 states
+[49/60] extra 4b9dfde1 ...
+      ... 4b9dfde1: 20,000 states, 14,003 queued, depth 7
+      optimal A* timed out, retrying with weighted A*
+      ... 4b9dfde1: 20,000 states, 5,194 queued, depth 15
+      ... 4b9dfde1: 40,000 states, 13,657 queued, depth 10
+extra  4b9dfde1 TIMEOUT     90.1s  time budget used up in 4b9dfde1 after 48097 states
+[50/60] extra 5fe1b337 ...
+      ... 5fe1b337: 20,000 states, 16,484 queued, depth 5
+      optimal A* timed out, retrying with weighted A*
+      ... 5fe1b337: 20,000 states, 16,484 queued, depth 5
+extra  5fe1b337 TIMEOUT     90.1s  time budget used up in 5fe1b337 after 37020 states
+[51/60] extra 0813d109 ...
+      ... 0813d109: 20,000 states, 7,849 queued, depth 11
+      optimal A* timed out, retrying with weighted A*
+      ... 0813d109: 20,000 states, 8,067 queued, depth 14
+      ... 0813d109: 40,000 states, 11,859 queued, depth 13
+      ... 0813d109: 60,000 states, 13,539 queued, depth 18
+      ... 0813d109: 80,000 states, 14,832 queued, depth 13
+extra  0813d109 TIMEOUT     90.2s  time budget used up in 0813d109 after 81781 states
+[52/60] hint 8a9bc86e ...
+hint   8a9bc86e OK           0.1s  27 chars  RRRRRRRRRRRRRRRRRRUURDRULUR
+[53/60] hint c53d6cb8 ...
+      ... c53d6cb8: 20,000 states, 6,276 queued, depth 9
+hint   c53d6cb8 OK          13.3s  42 chars  RRRRRRRRUURDRRRRRUULDRDLULDLLLURURDLDRUURU
+[54/60] hint 52b20c5f ...
+hint   52b20c5f OK           0.0s  54 chars  RRRRRRRRRUURRDRULUURLDRDDRRRUULRDDLLLUUURDDLDRRLUURRDD
+[55/60] hint 22f32079 ...
+hint   22f32079 OK           0.0s  13 chars  DRRULURDRURRR
+[56/60] hint 0ed3e8d9 ...
+hint   0ed3e8d9 OK           1.5s  31 chars  RRRRRRRRRRRUURDRRURULDDLULURRRR
+[57/60] hint 1e5e4e88 ...
+hint   1e5e4e88 OK           0.0s  12 chars  RRURRRRRRULL
+[58/60] hint 3d384b9e ...
+hint   3d384b9e OK           0.0s  12 chars  RURDLDRRURRR
+[59/60] hint 8f214ada ...
+      ... 8f214ada: 20,000 states, 9,695 queued, depth 7
+      ... 8f214ada: 40,000 states, 15,013 queued, depth 9
+      optimal A* timed out, retrying with weighted A*
+      ... 8f214ada: 20,000 states, 9,695 queued, depth 7
+      ... 8f214ada: 40,000 states, 15,013 queued, depth 9
+      ... 8f214ada: 60,000 states, 18,558 queued, depth 10
+hint   8f214ada TIMEOUT     90.3s  time budget used up in 8f214ada after 61171 states
+[60/60] hint f87c4aa3 ...
+hint   f87c4aa3 OK           0.1s  26 chars  RRRURRRULDRDDLURUULDDULLDR
+
+w2 weight=cell, budget=60s: 42/60 solved and replayed
+  TIMEOUT    normal 68241505
+  TIMEOUT    normal 0a113c1f
+  ERROR      normal d07f4968
+  TIMEOUT    normal f4df7bdf
+  TIMEOUT    normal e25aeb7a
+  OK~        normal 3b80a1f9
+  UNSOLVABLE hint   a7674929
+  TIMEOUT    normal ce9ce823
+  TIMEOUT    normal bd8dabb6
+  TIMEOUT    normal c4fc4564
+  TIMEOUT    normal 41d7e33b
+  TIMEOUT    extra  74d1628e
+  TIMEOUT    extra  a07a480b
+  TIMEOUT    extra  954fb031
+  TIMEOUT    extra  548490f7
+  TIMEOUT    extra  4b9dfde1
+  TIMEOUT    extra  5fe1b337
+  TIMEOUT    extra  0813d109
+  TIMEOUT    hint   8f214ada

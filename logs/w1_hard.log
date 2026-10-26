@@ -1,0 +1,87 @@
+[1/11] normal 0f029258 ...
+      ... 0f029258: 20,000 states, 11,108 queued, depth 7
+      ... 0f029258: 40,000 states, 20,084 queued, depth 8
+      optimal A* timed out, retrying with weighted A*
+      ... 0f029258: 20,000 states, 11,108 queued, depth 7
+      ... 0f029258: 40,000 states, 20,084 queued, depth 8
+      ... 0f029258: 60,000 states, 28,770 queued, depth 8
+      ... 0f029258: 80,000 states, 35,196 queued, depth 9
+normal 0f029258 TIMEOUT     90.1s  time budget used up in 0f029258 after 85107 states
+[2/11] normal 4b1153be ...
+      ... 4b1153be: 20,000 states, 14,621 queued, depth 6
+      ... 4b1153be: 40,000 states, 27,578 queued, depth 7
+      ... 4b1153be: 60,000 states, 39,355 queued, depth 7
+      optimal A* timed out, retrying with weighted A*
+      ... 4b1153be: 20,000 states, 14,621 queued, depth 6
+      ... 4b1153be: 40,000 states, 27,578 queued, depth 7
+      ... 4b1153be: 60,000 states, 39,355 queued, depth 7
+      ... 4b1153be: 80,000 states, 50,210 queued, depth 7
+      ... 4b1153be: 100,000 states, 60,631 queued, depth 8
+      ... 4b1153be: 120,000 states, 70,399 queued, depth 8
+normal 4b1153be TIMEOUT     90.2s  time budget used up in 4b1153be after 126512 states
+[3/11] normal a81d725f ...
+      ... a81d725f: 20,000 states, 6,412 queued, depth 11
+      ... a81d725f: 40,000 states, 11,558 queued, depth 13
+      optimal A* timed out, retrying with weighted A*
+      ... a81d725f: 20,000 states, 7,255 queued, depth 10
+      ... a81d725f: 40,000 states, 12,650 queued, depth 16
+      ... a81d725f: 60,000 states, 17,712 queued, depth 14
+      ... a81d725f: 80,000 states, 22,149 queued, depth 15
+normal a81d725f TIMEOUT     90.1s  time budget used up in a81d725f after 81301 states
+[4/11] normal 00c134fe ...
+      ... 00c134fe: 20,000 states, 7,740 queued, depth 10
+      optimal A* timed out, retrying with weighted A*
+      ... 00c134fe: 20,000 states, 7,740 queued, depth 10
+      ... 00c134fe: 40,000 states, 9,838 queued, depth 12
+normal 00c134fe TIMEOUT     90.1s  time budget used up in 00c134fe after 46128 states
+[5/11] normal f9ab0810 ...
+normal f9ab0810 OK          22.8s  103 chars  UDLLLURRDDDDRURULLLRUUULDLDRLUUUURRRRDDDDDLUULLDRURRDLRRURRDDDDLLUUUUDLLDDLDLLUUURURURDRUU
+[6/11] normal 32dce6a9 ...
+      ... 32dce6a9: 20,000 states, 3,773 queued, depth 22
+      optimal A* timed out, retrying with weighted A*
+      ... 32dce6a9: 20,000 states, 2,595 queued, depth 7
+      ... 32dce6a9: 40,000 states, 1,807 queued, depth 17
+normal 32dce6a9 TIMEOUT     90.1s  time budget used up in 32dce6a9 after 53875 states
+[7/11] extra 900ca6ab ...
+      ... 900ca6ab: 20,000 states, 13,391 queued, depth 15
+      ... 900ca6ab: 40,000 states, 27,032 queued, depth 12
+      optimal A* timed out, retrying with weighted A*
+      ... 900ca6ab: 20,000 states, 8,884 queued, depth 21
+extra  900ca6ab TIMEOUT    4213.6s  time budget used up in 900ca6ab after 35139 states
+[8/11] extra b25aa619 ...
+      ... b25aa619: 20,000 states, 14,438 queued, depth 7
+      ... b25aa619: 40,000 states, 27,712 queued, depth 9
+      optimal A* timed out, retrying with weighted A*
+      ... b25aa619: 20,000 states, 13,086 queued, depth 10
+      ... b25aa619: 40,000 states, 23,953 queued, depth 7
+      ... b25aa619: 60,000 states, 36,081 queued, depth 11
+      ... b25aa619: 80,000 states, 44,775 queued, depth 11
+extra  b25aa619 TIMEOUT     90.1s  time budget used up in b25aa619 after 81878 states
+[9/11] extra 85ad3cb0 ...
+      ... 85ad3cb0: 20,000 states, 8,941 queued, depth 13
+      optimal A* timed out, retrying with weighted A*
+      ... 85ad3cb0: 20,000 states, 10,844 queued, depth 10
+      ... 85ad3cb0: 40,000 states, 16,279 queued, depth 20
+extra  85ad3cb0 TIMEOUT     90.1s  time budget used up in 85ad3cb0 after 46918 states
+[10/11] hint eadb3d02 ...
+      optimal A* timed out, retrying with weighted A*
+      ... eadb3d02: 20,000 states, 15,961 queued, depth 5
+hint   eadb3d02 TIMEOUT     90.1s  time budget used up in eadb3d02 after 34593 states
+[11/11] hint 46c72163 ...
+      ... 46c72163: 20,000 states, 13,376 queued, depth 6
+      optimal A* timed out, retrying with weighted A*
+      ... 46c72163: 20,000 states, 13,376 queued, depth 6
+      ... 46c72163: 40,000 states, 25,514 queued, depth 7
+hint   46c72163 TIMEOUT     90.1s  time budget used up in 46c72163 after 46862 states
+
+weight=cell, budget=60s: 1/11 solved and replayed
+  TIMEOUT    normal 0f029258
+  TIMEOUT    normal 4b1153be
+  TIMEOUT    normal a81d725f
+  TIMEOUT    normal 00c134fe
+  TIMEOUT    normal 32dce6a9
+  TIMEOUT    extra  900ca6ab
+  TIMEOUT    extra  b25aa619
+  TIMEOUT    extra  85ad3cb0
+  TIMEOUT    hint   eadb3d02
+  TIMEOUT    hint   46c72163
