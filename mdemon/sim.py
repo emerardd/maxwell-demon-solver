@@ -503,6 +503,30 @@ class Model:
             new_pist[k] = (False, m)
         return tuple(new_pos), tuple(new_pist), tuple(temp)
 
+    def _envelop(self, s, d, seed):
+        """The push of seed in direction d is blocked: a piston pushed towards its front onto
+        a block that cannot move slides over it instead and takes it in (extended: pressed in,
+        +1 temperature). Seen in the game (w4-3's hint level). (pos, pist, temp) or None."""
+        occ = self.occupancy(s)
+        for P, (ext, c) in zip(self.pistons, s.pist):
+            if self.pdir[P] != d or c >= 0 or s.pos[P] is None:
+                continue
+            x, y = s.pos[P]
+            hit = occ.get((x + DIRS[d][0], y + DIRS[d][1]))
+            if hit is None or hit[0] in self.pdir or len(self.bodies[hit[0]].cells) > 1 or \
+                    self.bodies[hit[0]].fixed:
+                continue
+            a = hit[0]
+            r = self._move(s, d, [seed], held=(a,), envelop=(P, a))
+            if r is None or r[0][P] == s.pos[P]:
+                continue
+            pos, pist, temp = r
+            k = self.pindex[P]
+            if ext:
+                temp = temp[:P] + (self._passive(P, temp[P], +1),) + temp[P + 1:]
+            return pos, pist[:k] + ((False, a),) + pist[k + 1:], temp
+        return None
+
     def _actuate(self, s, P):
         """The move phase of piston P acting (hot contracted: extends; cold extended:
         contracts). The new state before heat transfer, or None when it is blocked.
@@ -595,7 +619,7 @@ class Model:
         occ = self.occupancy(s)
         if self.pistons:
             if target in occ:
-                r = self._move(s, d, [occ[target][0]])
+                r = self._move(s, d, [occ[target][0]]) or self._envelop(s, d, occ[target][0])
                 if r is None:
                     return None
                 pos, pist, temp = r

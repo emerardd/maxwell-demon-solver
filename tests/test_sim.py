@@ -731,6 +731,20 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         self.assertEqual(self.state(m, s, (3, 3)), (False, True))
         self.assertEqual(s.temp[pis], NEUTRAL)
 
+    def test_pushed_piston_slides_over_a_blocked_block(self):  # seen in the game (w4-3 hint)
+        # pushed down, the piston cannot push the stuck block below it into the wall, so it
+        # slides over it, takes it in and turns hot; the cold block next to it cancels that
+        m = piston(['#####',
+                    '#.@.#',
+                    '#...#',
+                    '#cO.#',
+                    '#####'], (2, 2), D, True, faces={(2, 3): (I, I, I, S)})
+        s = m.step(m.initial(), D)
+        self.assertEqual(s.demon, (2, 2))
+        self.assertEqual(self.state(m, s, (2, 3)), (False, True))
+        self.assertEqual(temp_at(m, s, (2, 3)), NEUTRAL)
+        self.assertEqual(temp_at(m, s, (1, 3)), NEUTRAL)
+
     def test_lower_number_acts_first(self):  # turn-2, piston priority
         # two hot empty pistons both extend, one step each, lowest number first
         level = build(['#######',
