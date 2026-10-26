@@ -31,34 +31,38 @@ class Solver:
         self.time_budget, self.progress, self.h_weight = time_budget, progress, h_weight
         self.world = world.World(levels, weight, max_depth)
         self.pruner, self.pruned = prune.Pruner(), 0
+        self.target = None  # level being solved in the current solve()
 
     def model(self, lid, solved, t_out):
         return self.world.model(lid, solved, t_out)
 
-    def solve(self, lid, solved=frozenset(), t_out=sim.NEUTRAL):
+    def solve(self, lid, solved=frozenset(), t_out=sim.NEUTRAL, scope=None):
         """Return (plan, solved set afterwards) or None if the level cannot be solved.
 
+        scope: start in this level instead (an ancestor of lid on its real chain) and succeed
+        once lid is solved; for levels only ever met inside another one.
         Iterative deepening on the path of entered levels: nested and self-referring levels
         make the state space grow quickly with depth, and most solutions stay shallow."""
         deadline = time.monotonic() + self.time_budget if self.time_budget else float('inf')
         depths = sorted({d for d in (2, 3, 4) if d < self.max_depth} | {self.max_depth})
+        self.target = lid
         try:
             for depth in depths:
                 self.world.max_depth, self.world.depth_hit = depth, False
-                result = self._search(lid, solved, t_out, deadline)
+                result = self._search(lid, solved, t_out, deadline, scope or lid)
                 if result is not None or not self.world.depth_hit:
                     return result  # found, or the limit never cut anything off
             return None
         finally:
             self.world.max_depth = self.max_depth
 
-    def _search(self, lid, solved, t_out, deadline):
+    def _search(self, lid, solved, t_out, deadline, root):
         w = self.world
-        h0 = w.start(lid, solved, t_out)
+        h0 = w.start(root, solved, t_out)
         m0 = w.current(h0)
         if not m0.starts:
             return None
-        if m0.won(h0.top):
+        if root == lid and m0.won(h0.top):
             return [], solved | {lid}
         # States are deduplicated by their canonical key; the actual state reached first is
         # kept so plans walk from where the demon really stands. settled[key]: the actual state
@@ -96,8 +100,8 @@ class Solver:
 
     def _h(self, h):
         """Push-distance bound while in the level being solved (INF marks a dead state).
-        Deeper in the path at least one more step is needed, and nothing is pruned."""
-        if len(h.path) == 1:
+        Anywhere else at least one more step is needed, and nothing is pruned."""
+        if len(h.path) == 1 and h.path[0].lid == self.target:
             return self.pruner.h(self.world.current(h), h.top)
         return 1
 
@@ -199,10 +203,10 @@ class Solver:
         return [s for chunk in reversed(chunks) for s in chunk]
 
 
-def replay(solver, lid, plan, solved=frozenset(), t_out=sim.NEUTRAL):
+def replay(solver, lid, plan, solved=frozenset(), t_out=sim.NEUTRAL, scope=None):
     """Re-execute a plan step by step through the rules; return (solved, final solved set)."""
     w = solver.world
-    h = w.start(lid, solved, t_out)
+    h = w.start(scope or lid, solved, t_out)
     steps = list(plan)
     i = 0
     while i < len(steps):

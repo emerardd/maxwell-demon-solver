@@ -34,6 +34,7 @@ class Body(NamedTuple):
     weight: int         # heat amount counted by the majority rule
     level_id: str       # '' unless this is a level block
     opaque: tuple       # per cell: stores heat and counts for goals
+    real: bool = False  # the level's real block (flag 1), not a shortcut (flag 0)
 
 
 class State(NamedTuple):
@@ -53,7 +54,7 @@ class Model:
     def __init__(self, level, solved=frozenset(), t_out=NEUTRAL, weight='cell'):
         self.level, self.w, self.h, self.t_out = level, level.w, level.h, t_out
         self.goals = [g for g in level.goals if self.inside(g)]
-        blocks, starts, level_of = {}, [], {}
+        blocks, starts, level_of, real_cells = {}, [], {}, set()
         for y, row in enumerate(level.grid):
             for x, o in enumerate(row):
                 if isinstance(o, mxw.Start):
@@ -62,6 +63,8 @@ class Model:
                     b = o.solved if o.id in solved else o.unsolved
                     blocks[(x, y)] = b
                     level_of[(x, y)] = o.id
+                    if o.flag == 1:
+                        real_cells.add((x, y))
                 elif isinstance(o, mxw.Block):
                     blocks[(x, y)] = o
                 elif o is not None:
@@ -119,10 +122,13 @@ class Model:
                 weight=sum(opaque) if weight == 'cell' else int(any(opaque)),
                 level_id=lid,
                 opaque=opaque,
+                real=cells[0] in real_cells,
             ))
             pos.append((ox, oy))
             temp.append(t_out if self.bodies[-1].outside else (heat > 0) - (heat < 0))
         self.initial_pos, self.initial_temp = tuple(pos), tuple(temp)
+        # level id -> body index of its real level block in this level
+        self.real_block = {b.level_id: bi for bi, b in enumerate(self.bodies) if b.real}
         # Per body, its sticky faces that point out of the body, as (cell dx, cell dy, side).
         self.sticky = []
         for b in self.bodies:

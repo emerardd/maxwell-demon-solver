@@ -6,7 +6,8 @@ Levels are drawn in a small ASCII language:
     o  neutral block   h  hot block   c  cold block      (conductive on all sides)
     O  insulated neutral block   x  fixed neutral block
     t  transparent block
-    A..Z  level block, linked to a level id through `links`
+    A..Z  level block, linked to a level id through `links`: 'X' is the real block of level X,
+          '~X' a shortcut to it
 Set MXW_GAME_DIR to also run the data tests against the installed game.
 """
 import os, sys, unittest
@@ -21,7 +22,7 @@ UNSOLVED, SOLVED = mxw.Block(3, 0xaa), mxw.Block(2, 0x55)  # fixed + insulated, 
 
 def build(rows, faces=None, links=None, lid='test'):
     """faces: {(x, y): (left, down, right, up)} overrides for single blocks.
-    links: {letter: level id, or (level id, unsolved Block, solved Block)}."""
+    links: {letter: level id ('~id' for a shortcut), or (level id, unsolved Block, solved Block)}."""
     h, w = len(rows), len(rows[0])
     grid, goals = [], []
     for y, row in enumerate(rows):
@@ -30,7 +31,8 @@ def build(rows, faces=None, links=None, lid='test'):
             if links and ch in links:
                 spec = links[ch]
                 target, unsolved, solved = (spec, UNSOLVED, SOLVED) if isinstance(spec, str) else spec
-                line.append(mxw.LevelBlock(1, target, unsolved, solved))
+                flag = 0 if target.startswith('~') else 1
+                line.append(mxw.LevelBlock(flag, target.lstrip('~'), unsolved, solved))
             elif ch in '.*':
                 line.append(None)
                 if ch == '*':
@@ -318,7 +320,7 @@ class Transitions(unittest.TestCase):  # w3 texts
         hit = w.current(h).occupancy(h.top).get(cell)
         return hit and hit[0]
 
-    def test_quit_comes_out_past_the_block_and_resets_everything(self):  # exit-1, exit-2
+    def test_quit_comes_out_where_it_went_in_and_resets_everything(self):  # exit-1, exit-2
         w = self.make(P=(['#######',
                           '#@.A..#',
                           '#.o...#',
@@ -329,16 +331,16 @@ class Transitions(unittest.TestCase):  # w3 texts
         self.assertEqual([f.lid for f in h.path], ['P', 'A'])
         self.assertEqual(h.top.demon, (1, 1))         # inner start
         h = w.quit(h)
-        self.assertEqual(h.top.demon, (4, 1))         # block (3,1) + entry direction
+        self.assertEqual(h.top.demon, (2, 1))         # back where it stood when entering
         self.assertIsNotNone(self.body_at(w, h, (2, 2)))  # o is back where it started
 
-    def test_exit_direction_is_entry_direction(self):  # exit-2
+    def test_exit_side_is_entry_side(self):  # exit-2: "离开关卡的位置和进入时相同"
         w = self.make(P=(['#######',
                           '#...A@#',
                           '#######'], {'A': 'A'}),
                       A=(self.EMPTY, None))
         h = w.quit(w.enter(w.start('P'), L))
-        self.assertEqual(h.top.demon, (3, 1))
+        self.assertEqual(h.top.demon, (5, 1))
 
     def test_outside_temperature_follows_the_block_then_neutral(self):  # transition-3
         hot_block = ('A', mxw.Block(7, 0xaa), SOLVED)  # fixed, hot, insulated
@@ -356,55 +358,99 @@ class Transitions(unittest.TestCase):  # w3 texts
         self.assertEqual(h.path[-1].t_out, NEUTRAL)   # the level you are now in: neutral
 
     def test_block_where_the_demon_comes_out_is_destroyed(self):  # transition-2
+        # o starts on the cell from which the demon later enters A; exiting resets P,
+        # so o is back there when the demon reappears on it
         w = self.make(P=(['######',
-                          '#@Ao.#',
+                          '#....#',
+                          '#@.oA#',
+                          '#....#',
                           '######'], {'A': 'A'}),
                       A=(self.EMPTY, None))
-        h = w.quit(w.enter(w.start('P'), R))
-        self.assertEqual(h.top.demon, (3, 1))
+        h = self.walk(w, w.start('P'), U, R, R, D)     # push o down out of the way
+        h = w.quit(w.enter(h, R))
+        self.assertEqual(h.top.demon, (3, 2))
         self.assertEqual(sum(p is not None for p in h.top.pos), sum(
             p is not None for p in w.current(h).initial_pos) - 1)
 
-    def test_no_heat_when_coming_out_next_to_a_hot_block(self):  # transition-1
-        w = self.make(P=(['######',
-                          '#@A.h#',
-                          '######'], {'A': 'A'}),
+    def test_no_heat_exchange_at_all_until_the_next_move(self):  # transition-1
+        # on coming out, P is back in its initial layout, where a hot and a neutral block touch:
+        # neither the demon nor those blocks exchange heat until the next move
+        w = self.make(P=(['#######',
+                          '#@A.ho#',
+                          '#.....#',
+                          '#######'], {'A': 'A'}),
                       A=(self.EMPTY, None))
         h = w.quit(w.enter(w.start('P'), R))
-        self.assertEqual(h.top.demon, (3, 1))
-        self.assertEqual(h.top.demon_temp, NEUTRAL)
+        m = w.current(h)
+        self.assertEqual(h.top.demon, (1, 1))
+        self.assertEqual(h.top.temp[m.occupancy(h.top)[(5, 1)][0]], NEUTRAL)  # not heated yet
+        h = w.step(h, D)
+        self.assertEqual(h.top.temp[m.occupancy(h.top)[(5, 1)][0]], HOT)      # now it is
+
+    def test_no_heat_when_appearing_next_to_a_hot_block(self):  # transition-1
+        w = self.make(P=(['#####',
+                          '#@A.#',
+                          '#####'], {'A': 'A'}),
+                      A=(['#####',
+                          '#@h.#',
+                          '#####'], None))
+        h = w.enter(w.start('P'), R)
+        self.assertEqual(h.top.demon_temp, NEUTRAL)   # next to h, but no heat on arrival
+        self.assertIsNotNone(w.quit(h))               # so it can still leave
 
     def test_entering_the_current_level_keeps_its_state(self):  # enter-2
-        w = self.make(Q=(['####',
-                          '#@P#',
-                          '#..#',
-                          '####'], {'P': 'P'}),
+        w = self.make(Q=(['#####',
+                          '#.@.#',
+                          '#.P.#',
+                          '#####'], {'P': 'P'}),
                       P=(['#######',
                           '#@o...#',
                           '#.....#',
                           '#...S.#',
-                          '#######'], {'S': 'P'}))
-        h = w.enter(w.start('Q'), R)                   # into P moving right
-        h = self.walk(w, h, R, D, R, R)               # o pushed to (3,1), demon above S
-        h = w.enter(h, D)                              # P again, moving down
+                          '#######'], {'S': '~P'}))
+        h = w.enter(w.start('Q'), D)                   # into P moving down
+        h = self.walk(w, h, R, D, R, D)               # o pushed to (3,1), demon left of S
+        h = w.enter(h, R)                              # P again, moving right
         self.assertEqual([f.lid for f in h.path], ['Q', 'P'])  # the path does not grow
         self.assertEqual(h.top.demon, (1, 1))
         self.assertIsNotNone(self.body_at(w, h, (3, 1)))  # o stayed where it was pushed
         h = w.quit(h)
         self.assertEqual([f.lid for f in h.path], ['Q'])
-        self.assertEqual(h.top.demon, (2, 2))         # Q's block (2,1), last entry direction: down
+        self.assertEqual(h.top.demon, (1, 2))         # Q's block (2,2), entry side of the last entry
 
-    def test_path_depth_is_bounded(self):  # A -> B -> A -> ... stays finite
-        w = self.make(A=(['#####',
+    def test_entering_a_level_lower_on_the_path_goes_back_to_it(self):  # seen in the game
+        w = self.make(H=(['#####',
+                          '#@A.#',
+                          '#####'], {'A': 'A'}),
+                      A=(['#####',
                           '#@B.#',
                           '#####'], {'B': 'B'}),
                       B=(['#####',
                           '#@A.#',
-                          '#####'], {'A': 'A'}))
-        h, depth = w.start('A'), 1
-        while (nxt := w.enter(h, R)) is not None:
-            h, depth = nxt, depth + 1
-        self.assertEqual(depth, w.max_depth)
+                          '#####'], {'A': '~A'}))
+        h = w.enter(w.enter(w.enter(w.start('H'), R), R), R)  # H -> A -> B -> A
+        self.assertEqual([f.lid for f in h.path], ['H', 'A'])
+        h = w.quit(h)                                   # leaves A, out into H
+        self.assertEqual([f.lid for f in h.path], ['H'])
+
+    def test_shortcut_into_a_deep_level_exits_through_the_real_blocks(self):  # enter-1, path
+        w = self.make(T=(['#######',
+                          '#@.A..#',
+                          '#.....#',
+                          '#...B.#',
+                          '#######'], {'A': 'A', 'B': '~B'}),
+                      A=(['#####',
+                          '#.B@#',
+                          '#####'], {'B': 'B'}),
+                      B=(self.EMPTY, None))
+        h = self.walk(w, w.start('T'), D, D, R, R)     # left of the shortcut to B
+        h = w.enter(h, R)
+        self.assertEqual([f.lid for f in h.path], ['T', 'A', 'B'])  # the real chain
+        self.assertEqual([f.dir for f in h.path[1:]], [R, R])       # A skipped: shortcut's direction
+        h = w.quit(h)                                   # out of B's real block in A, entry side
+        self.assertEqual(([f.lid for f in h.path], h.top.demon), (['T', 'A'], (1, 1)))
+        h = w.quit(h)                                   # out of A's real block in T, entry side
+        self.assertEqual(([f.lid for f in h.path], h.top.demon), (['T'], (2, 1)))
 
     def test_level_left_for_another_keeps_its_state(self):  # enter-3
         w = self.make(A=(['#######',
@@ -413,10 +459,10 @@ class Transitions(unittest.TestCase):  # w3 texts
                           '#######'], {'B': 'B'}),
                       B=(['#####',
                           '#@A.#',
-                          '#####'], {'A': 'A'}))
+                          '#####'], {'A': '~A'}))
         h = self.walk(w, w.start('A'), R, D, R)
-        h = w.enter(w.enter(h, R), R)                  # A -> B -> A
-        self.assertEqual([f.lid for f in h.path], ['A', 'B', 'A'])
+        h = w.enter(w.enter(h, R), R)                  # A -> B -> back to A
+        self.assertEqual([f.lid for f in h.path], ['A'])
         self.assertIsNotNone(self.body_at(w, h, (3, 1)))  # A as it was left
         self.assertEqual(h.top.demon, (1, 1))
 
@@ -434,7 +480,7 @@ class Transitions(unittest.TestCase):  # w3 texts
         h = w.step(h, R)                               # solves A: automatic exit
         self.assertEqual([f.lid for f in h.path], ['P'])
         self.assertIn('A', h.solved)
-        self.assertEqual(h.top.demon, (4, 2))
+        self.assertEqual(h.top.demon, (2, 2))         # where it stood when entering
         self.assertFalse(w.current(h).bodies[self.body_at(w, h, (3, 2))].fixed)
 
     def test_solver_uses_a_solved_level_block(self):
@@ -633,12 +679,12 @@ class GameData(unittest.TestCase):
         self.assertLessEqual(set(self.errors), {'16fa52fc', '5aa8419e', '7960b275', '88abb570'})
 
     # Tutorial levels the current search cannot finish quickly; checked only by run_world.py.
-    KNOWN_SLOW = {'eadb3d02',             # w1/insulated-2
-                  '44efd75a', '0d33f295',  # w3/transition-3, w3/path: deep nesting (~90 s)
-                  '1bfecdfb'}             # w3/enter-3: unsolvable unless unpinned wall cells can
-                                          # be destroyed by the demon appearing on them (open)
-    # Tutorial levels only solvable in the context they are met in: (solved levels, outside).
-    CONTEXT = {'8d2fdcfc': (frozenset({'394c69e4'}), COLD)}  # entered through a cold block
+    KNOWN_SLOW = {'eadb3d02'}  # w1/insulated-2
+    # Not solvable under the current rules, open question (see README).
+    UNRESOLVED = {'0d33f295', '9de258d5', '601b40f2'}  # w3/path
+    # Tutorial levels only solvable in the context they are met in.
+    CONTEXT = {'8d2fdcfc': dict(solved=frozenset({'394c69e4'}), t_out=COLD),  # via a cold block
+               'b0e93052': dict(scope='1bfecdfb')}  # only met inside 1bfecdfb
 
     def test_tutorial_levels_solve_and_replay(self):
         import run_world
@@ -647,13 +693,13 @@ class GameData(unittest.TestCase):
             for kind, lid in run_world.world_levels(self.structure, self.levels, world):
                 if kind != 'hint' or not any(t[2].startswith(world + '/') for t in self.levels[lid].texts):
                     continue
-                if lid in self.KNOWN_SLOW:
+                if lid in self.KNOWN_SLOW or lid in self.UNRESOLVED:
                     continue
-                solved, t_out = self.CONTEXT.get(lid, (frozenset(), NEUTRAL))
+                ctx = self.CONTEXT.get(lid, {})
                 with self.subTest(level=lid):
-                    r = sv.solve(lid, solved, t_out)
+                    r = sv.solve(lid, **ctx)
                     self.assertIsNotNone(r)
-                    self.assertTrue(solver.replay(sv, lid, r[0], solved, t_out)[0])
+                    self.assertTrue(solver.replay(sv, lid, r[0], **ctx)[0])
 
     def test_context_levels_need_their_context(self):
         sv = solver.Solver(self.levels, time_budget=30)

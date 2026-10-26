@@ -1,0 +1,26 @@
+[1/23] 02d5488b OK           0.1s  ['w3/exit-1']  RRUU[EU]RDDRRRRUU[EU][Q]DDL
+[2/23] ab7435ad OK           0.0s  ['w3/exit-1']  R
+[3/23] c868ad46 OK           0.0s  ['w3/exit-2']  RRRRR[ER]RRDR[EU]RRULLL
+[4/23] 1819343f OK           0.0s  ['w3/exit-2']  R
+[5/23] b2d1b7fb OK           0.0s  ['w3/enter-1']  RRUR[ED]RD
+[6/23] 26632a3d OK           0.0s  ['w3/enter-1']  R
+[7/23] 6d50f9a6 OK           0.0s  ['w3/enter-2']  RRR[EU]RRDDLDDRUUU[EU]RRR[EU]RRDD[ED][Q]DLDRR
+[8/23] 146c40ae OK           0.0s  ['w3/enter-2']  RRDDLDDRUUU[EU]RRR
+[9/23] 9078c4bd OK           0.0s  ['w3/transition-1']  RRDRRR[EU]ULURRRURDD[EL]RDLUDLLLUURR[ER][Q]RRR
+[10/23] 31015a8c OK           0.0s  ['w3/transition-1']  ULURRRURDD[EL]R
+[11/23] 58266cf4 OK           0.1s  ['w3/transition-2']  RR[ER]DRRRRULLRRUR[ED]DRURULDLUDLDDRUU
+[12/23] 709dcc60 OK           0.1s  ['w3/transition-2']  DRRRRULLRR[ER]DRURULDLU
+[13/23] 44efd75a OK           4.4s  ['w3/transition-3']  RR[ER]R[ER]RR[ER]RRRRDRU[Q][ER]RRRRDRRRRR
+[14/23] 8d2fdcfc UNSOLVABLE   1.7s  ['w3/transition-3']  
+[15/23] 394c69e4 OK           0.0s  ['w3/transition-3']  RRRRDRU
+[16/23] 1bfecdfb OK           0.5s  ['w3/enter-3']  RRRRD[ER]RRDRRRRULULDRDLLRR[ED]RRRRD[ER]RRDULLRRD[ER]RRDRRR[ED]RRRRDDRRULDLURRUL
+[17/23] b0e93052 UNSOLVABLE   0.0s  ['w3/enter-3']  
+[18/23] 0d33f295 UNSOLVABLE   0.2s  ['w3/path']  
+[19/23] 9de258d5 UNSOLVABLE   0.1s  ['w3/path']  
+[20/23] 601b40f2 UNSOLVABLE   0.0s  ['w3/path']  
+[21/23] df7293f8 OK          12.2s  ['w3/enter-4']  RR[ER]RURR[ED]RR[ED]RRRDDRRURRDLLU[EU]RURRRDLLLLURRR
+[22/23] b9f2b2e0 OK           4.6s  ['w3/enter-4']  RURR[ED]RR[ED]RRRDDRRURRDLLU[EU]RURRRDLLL
+[23/23] 3de2408c OK           0.0s  ['w3/enter-4']  RR[ED]RRRDDRRU
+8d2fdcfc OK(via 44efd75a): solved as part of that level, was UNSOLVABLE on its own
+b0e93052 OK(via 1bfecdfb): solved as part of that level, was UNSOLVABLE on its own
+w3: 20/23 tutorial levels solved and replayed
