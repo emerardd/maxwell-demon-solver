@@ -407,11 +407,13 @@ class Model:
         """Temperature of piston P after being pressed in (+1) or pulled out (-1)."""
         return t if self.bodies[P].transparent else max(COLD, min(HOT, t + delta))
 
-    def _move(self, s, d, seeds, held=(), demon_blocks=False, detach=-1, envelop=None):
+    def _move(self, s, d, seeds, held=(), push_demon=False, detach=-1, envelop=None):
         """Move seeds one cell in direction d, with everything they push, drag or carry.
-        Returns (pos, pist, temp) or None when blocked.
+        Returns (pos, pist, temp, demon) or None when blocked.
 
-        held: bodies that must stay. demon_blocks: the demon is in the way (piston moves).
+        held: bodies that must stay. push_demon: a moved body hitting the demon pushes it
+        along like a block (piston moves; seen in the game: the demon may be burnt in the
+        middle of a turn and pushed to a safe cell, only the end of the turn counts).
         detach: a piston that neither carries its content nor is carried by it. envelop:
         (piston, body) where the piston may move onto the body's cell, taking it in.
 
@@ -430,6 +432,7 @@ class Model:
         rigid = set()  # pistons that turned out to move: their fronts take no blocks in
         while True:
             moving, entries, exits, stack = set(), {}, {}, list(seeds)
+            demon = s.demon
             while stack:
                 b = stack.pop()
                 if b in moving:
@@ -463,8 +466,15 @@ class Model:
                     px, py = pos[m]
                     for cx, cy in self.bodies[m].cells:
                         n = (px + cx + dx, py + cy + dy)
-                        if not self.inside(n) or (demon_blocks and n == s.demon):
+                        if not self.inside(n):
                             return None
+                        if push_demon and n == s.demon and demon == s.demon:
+                            demon = (n[0] + dx, n[1] + dy)
+                            if not self.inside(demon):
+                                return None
+                            hit = occ.get(demon)
+                            if hit is not None and hit[0] not in moving:
+                                stack.append(hit[0])
                         hit = occ.get(n)
                         if hit is None or hit[0] in moving or envelop == (m, hit[0]):
                             continue
@@ -501,12 +511,12 @@ class Model:
             if pist[k][0]:
                 temp[P] = self._passive(P, temp[P], +1)
             new_pist[k] = (False, m)
-        return tuple(new_pos), tuple(new_pist), tuple(temp)
+        return tuple(new_pos), tuple(new_pist), tuple(temp), demon
 
     def _envelop(self, s, d, seed):
         """The push of seed in direction d is blocked: a piston pushed towards its front onto
         a block that cannot move slides over it instead and takes it in (extended: pressed in,
-        +1 temperature). Seen in the game (w4-3's hint level). (pos, pist, temp) or None."""
+        +1 temperature). Seen in the game (w4-3's hint level). (pos, pist, temp, demon) or None."""
         occ = self.occupancy(s)
         for P, (ext, c) in zip(self.pistons, s.pist):
             if self.pdir[P] != d or c >= 0 or s.pos[P] is None:
@@ -520,11 +530,11 @@ class Model:
             r = self._move(s, d, [seed], held=(a,), envelop=(P, a))
             if r is None or r[0][P] == s.pos[P]:
                 continue
-            pos, pist, temp = r
+            pos, pist, temp, demon = r
             k = self.pindex[P]
             if ext:
                 temp = temp[:P] + (self._passive(P, temp[P], +1),) + temp[P + 1:]
-            return pos, pist[:k] + ((False, a),) + pist[k + 1:], temp
+            return pos, pist[:k] + ((False, a),) + pist[k + 1:], temp, demon
         return None
 
     def _actuate(self, s, P):
@@ -537,26 +547,27 @@ class Model:
         if not ext:
             new = (True, -1)
             if c < 0:
-                r = s.pos, s.pist, s.temp
+                r = s.pos, s.pist, s.temp, s.demon
             else:
-                r = (self._move(s, front, [c], held=(P,), demon_blocks=True) or
-                     self._move(s, OPP[front], [P], held=(c,), demon_blocks=True, detach=P))
+                r = (self._move(s, front, [c], held=(P,), push_demon=True) or
+                     self._move(s, OPP[front], [P], held=(c,), push_demon=True, detach=P))
         else:
             a = self._links(s.pos, s.holes, s.pist).get(P)
             new = (False, a if a is not None else -1)
             if a is None:
-                r = s.pos, s.pist, s.temp
+                r = s.pos, s.pist, s.temp, s.demon
             elif len(self.bodies[a].cells) > 1 or a in self.pdir:
                 return None
             else:
-                r = (self._move(s, OPP[front], [a], held=(P,), demon_blocks=True) or
-                     self._move(s, front, [P], held=(a,), demon_blocks=True, envelop=(P, a)))
+                r = (self._move(s, OPP[front], [a], held=(P,), push_demon=True) or
+                     self._move(s, front, [P], held=(a,), push_demon=True, envelop=(P, a)))
         if r is None:
             return None
-        pos, pist, temp = r
+        pos, pist, temp, demon = r
         pist = pist[:k] + (new,) + pist[k + 1:]
         temp = temp[:P] + (NEUTRAL,) + temp[P + 1:]
-        return s._replace(pos=pos, pist=pist, temp=temp, glue=self._glue(pos, s.glue, s.holes, pist))
+        return s._replace(demon=demon, pos=pos, pist=pist, temp=temp,
+                          glue=self._glue(pos, s.glue, s.holes, pist))
 
     def triggered(self, s):
         """Pistons that want to act, in the order they are tried: hot and contracted, or cold
@@ -622,7 +633,7 @@ class Model:
                 r = self._move(s, d, [occ[target][0]]) or self._envelop(s, d, occ[target][0])
                 if r is None:
                     return None
-                pos, pist, temp = r
+                pos, pist, temp, _ = r
                 s = s._replace(pos=pos, pist=pist, temp=temp,
                                glue=self._glue(pos, s.glue, s.holes, pist))
             return self._turn(s._replace(demon=target))

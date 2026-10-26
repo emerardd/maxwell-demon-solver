@@ -696,24 +696,25 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         self.assertIn((4, 1), m.occupancy(s))
 
     def test_pressing_a_block_in_heats_the_piston(self):  # piston-passive-1
-        # the block goes in and the piston turns hot; it cannot push the block back out
-        # while the demon stands in front and the wall is behind, so it waits
+        # the block goes in and the piston turns hot, so in the same turn it extends again
+        # and pushes the block back out, the demon in front of it too
         m = piston(['######',
                     '#.@O.#',
                     '######'], (4, 1), L, True, faces={(3, 1): (I, I, I, I)})
+        P = m.occupancy(m.initial())[(4, 1)][0]
+        moved = m._move(m.initial(), R, [m.occupancy(m.initial())[(3, 1)][0]])
+        self.assertEqual(moved[1][m.pindex[P]][0], False)  # pressed in ...
+        self.assertEqual(moved[2][P], HOT)                 # ... and hot
         s = self.steps(m, [R])
-        self.assertEqual(s.demon, (3, 1))
-        self.assertEqual(self.state(m, s, (4, 1)), (False, True))
-        self.assertEqual(s.temp[m.occupancy(s)[(4, 1)][0]], HOT)
-        s = m.step(s, L)  # the way is free: the piston extends and the block comes out
+        self.assertEqual(s.demon, (2, 1))
         self.assertEqual(self.state(m, s, (4, 1)), (True, False))
         self.assertIn((3, 1), m.occupancy(s))
+        self.assertEqual(s.temp[P], NEUTRAL)
 
     def test_pulling_a_stuck_block_out_cools_the_piston(self):  # piston-passive-2
         # the content is stuck to the movable side and to the block in front, which is stuck
         # to the block the demon pushes up. Cold and extended, the piston contracts in the
-        # same turn; the blocks cannot come back (the demon is in the way), so the piston
-        # moves up over its old content instead.
+        # same turn and pulls everything back, pushing the demon back down.
         m = piston(['######',
                     '#....#',
                     '#....#',
@@ -727,8 +728,9 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         self.assertEqual(moved[1][m.pindex[pis]], (True, -1))  # pulled out: extended, cold
         self.assertEqual(moved[2][pis], COLD)
         s = m.step(s, U)
-        self.assertEqual(s.pos[pis], (3, 3))
-        self.assertEqual(self.state(m, s, (3, 3)), (False, True))
+        self.assertEqual(s.demon, (2, 4))
+        self.assertEqual(s.pos[pis], (3, 4))
+        self.assertEqual(self.state(m, s, (3, 4)), (False, True))
         self.assertEqual(s.temp[pis], NEUTRAL)
 
     def test_pushed_piston_slides_over_a_blocked_block(self):  # seen in the game (w4-3 hint)
