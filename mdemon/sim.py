@@ -407,13 +407,12 @@ class Model:
         """Temperature of piston P after being pressed in (+1) or pulled out (-1)."""
         return t if self.bodies[P].transparent else max(COLD, min(HOT, t + delta))
 
-    def _move(self, s, d, seeds, held=(), push_demon=False, detach=-1, envelop=None):
+    def _move(self, s, d, seeds, held=(), demon=None, detach=-1, envelop=None):
         """Move seeds one cell in direction d, with everything they push, drag or carry.
         Returns (pos, pist, temp, demon) or None when blocked.
 
-        held: bodies that must stay. push_demon: a moved body hitting the demon pushes it
-        along like a block (piston moves; seen in the game: the demon may be burnt in the
-        middle of a turn and pushed to a safe cell, only the end of the turn counts).
+        held: bodies that must stay. demon: for piston moves, 'block' (the demon is in the way)
+        or 'push' (pushed along like a block); None for the demon's own push.
         detach: a piston that neither carries its content nor is carried by it. envelop:
         (piston, body) where the piston may move onto the body's cell, taking it in.
 
@@ -432,7 +431,7 @@ class Model:
         rigid = set()  # pistons that turned out to move: their fronts take no blocks in
         while True:
             moving, entries, exits, stack = set(), {}, {}, list(seeds)
-            demon = s.demon
+            where = s.demon
             while stack:
                 b = stack.pop()
                 if b in moving:
@@ -468,11 +467,13 @@ class Model:
                         n = (px + cx + dx, py + cy + dy)
                         if not self.inside(n):
                             return None
-                        if push_demon and n == s.demon and demon == s.demon:
-                            demon = (n[0] + dx, n[1] + dy)
-                            if not self.inside(demon):
+                        if demon and n == s.demon and where == s.demon:
+                            if demon == 'block':
                                 return None
-                            hit = occ.get(demon)
+                            where = (n[0] + dx, n[1] + dy)
+                            if not self.inside(where):
+                                return None
+                            hit = occ.get(where)
                             if hit is not None and hit[0] not in moving:
                                 stack.append(hit[0])
                         hit = occ.get(n)
@@ -511,7 +512,7 @@ class Model:
             if pist[k][0]:
                 temp[P] = self._passive(P, temp[P], +1)
             new_pist[k] = (False, m)
-        return tuple(new_pos), tuple(new_pist), tuple(temp), demon
+        return tuple(new_pos), tuple(new_pist), tuple(temp), where
 
     def _envelop(self, s, d, seed):
         """The push of seed in direction d is blocked: a piston pushed towards its front onto
@@ -541,7 +542,10 @@ class Model:
         """The move phase of piston P acting (hot contracted: extends; cold extended:
         contracts). The new state before heat transfer, or None when it is blocked.
         Extending pushes the content out, or else moves the piston back off it; contracting
-        pulls a block stuck to the movable side in, or else moves the piston over it."""
+        pulls a block stuck to the movable side in, or else moves the piston over it. Only
+        when neither works without pushing the demon is the demon pushed away (seen in the
+        game: w4-2 moves the piston back rather than the demon, 1ef673fc and w4-2's first
+        press push the demon, the piston being stuck)."""
         k, front = self.pindex[P], self.pdir[P]
         ext, c = s.pist[k]
         if not ext:
@@ -549,8 +553,10 @@ class Model:
             if c < 0:
                 r = s.pos, s.pist, s.temp, s.demon
             else:
-                r = (self._move(s, front, [c], held=(P,), push_demon=True) or
-                     self._move(s, OPP[front], [P], held=(c,), push_demon=True, detach=P))
+                r = next(filter(None, (
+                    self._move(s, front, [c], held=(P,), demon=how) or
+                    self._move(s, OPP[front], [P], held=(c,), demon=how, detach=P)
+                    for how in ('block', 'push'))), None)
         else:
             a = self._links(s.pos, s.holes, s.pist).get(P)
             new = (False, a if a is not None else -1)
@@ -559,8 +565,10 @@ class Model:
             elif len(self.bodies[a].cells) > 1 or a in self.pdir:
                 return None
             else:
-                r = (self._move(s, OPP[front], [a], held=(P,), push_demon=True) or
-                     self._move(s, front, [P], held=(a,), push_demon=True, envelop=(P, a)))
+                r = next(filter(None, (
+                    self._move(s, OPP[front], [a], held=(P,), demon=how) or
+                    self._move(s, front, [P], held=(a,), demon=how, envelop=(P, a))
+                    for how in ('block', 'push'))), None)
         if r is None:
             return None
         pos, pist, temp, demon = r

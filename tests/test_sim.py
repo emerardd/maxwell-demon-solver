@@ -714,7 +714,8 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
     def test_pulling_a_stuck_block_out_cools_the_piston(self):  # piston-passive-2
         # the content is stuck to the movable side and to the block in front, which is stuck
         # to the block the demon pushes up. Cold and extended, the piston contracts in the
-        # same turn and pulls everything back, pushing the demon back down.
+        # same turn; pulling the blocks back would push the demon, so the piston moves up
+        # over its old content instead.
         m = piston(['######',
                     '#....#',
                     '#....#',
@@ -728,9 +729,9 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         self.assertEqual(moved[1][m.pindex[pis]], (True, -1))  # pulled out: extended, cold
         self.assertEqual(moved[2][pis], COLD)
         s = m.step(s, U)
-        self.assertEqual(s.demon, (2, 4))
-        self.assertEqual(s.pos[pis], (3, 4))
-        self.assertEqual(self.state(m, s, (3, 4)), (False, True))
+        self.assertEqual(s.demon, (2, 3))
+        self.assertEqual(s.pos[pis], (3, 3))
+        self.assertEqual(self.state(m, s, (3, 3)), (False, True))
         self.assertEqual(s.temp[pis], NEUTRAL)
 
     def test_pushed_piston_slides_over_a_blocked_block(self):  # seen in the game (w4-3 hint)
