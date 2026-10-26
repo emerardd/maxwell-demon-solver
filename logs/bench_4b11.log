@@ -1,0 +1,9 @@
+4b1153be A admissible greedy: TIMEOUT     45.0s  113,599 states  
+4b1153be B informed  w=3   : TIMEOUT     45.0s   60,191 states  
+4b1153be C informed  greedy: TIMEOUT     45.0s   55,137 states  
+1e9b113b A admissible greedy: OK           1.5s    2,870 states  88 chars
+1e9b113b B informed  w=3   : OK           0.2s      463 states  92 chars
+1e9b113b C informed  greedy: OK           0.2s      470 states  92 chars
+eadb3d02 A admissible greedy: TIMEOUT     45.0s   98,511 states  
+eadb3d02 B informed  w=3   : TIMEOUT     45.0s   84,479 states  
+eadb3d02 C informed  greedy: TIMEOUT     45.0s   84,077 states  

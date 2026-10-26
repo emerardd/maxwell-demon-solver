@@ -165,6 +165,8 @@ class Pruner:
     OBSTACLE = 3   # informed heuristic: per movable group standing on the candidate's route
     HAZARD = 4     # per hot body that would burn the demon at a push position on the route
     NO_COLD = 10   # a hazard and no cold block anywhere: cooling is not an option
+    CHILL = 3      # turning a neutral block cold at a cold source first
+    TOO_WEAK = 8   # the carrier holds less cold than the hazard holds heat
 
     def informed(self, m, s):
         """Not admissible, meant to guide a search that need not find the shortest plan.
@@ -177,8 +179,7 @@ class Pruner:
         t = self.tables(m)
         occ = m.occupancy(s)
         groups = m.groups(s.glue)
-        colds = [p for bi, p in enumerate(s.pos)
-                 if p is not None and s.temp[bi] == COLD and m.bodies[bi].weight and not m.bodies[bi].outside]
+        carriers = self._carriers(m, s, groups)
         best = INF
         for d, table, origin, shape, members in self._candidates(m, s, t):
             blockers, hazards, o = set(), set(), origin
@@ -191,16 +192,20 @@ class Pruner:
                     hit = occ.get((nxt[0] + cx, nxt[1] + cy))
                     if hit is not None and hit[0] not in members and not m.bodies[hit[0]].fixed:
                         blockers.add(groups[s.glue[hit[0]]][0])
-                # after this push the demon stands where the shape's origin was
-                hazards |= self._burning(m, s, occ, o, members, nxt)
+                # after this push the demon stands where the shape's origin was. (Checking
+                # the cell behind the shape before the push as well was tried: it misled the
+                # search on eadb3d02 and did not crack 4b1153be.)
+                step = (nxt[0] - o[0], nxt[1] - o[1])
+                hazards |= self._burning(m, s, occ, o, members, step)
                 o = nxt
             v = d + self.OBSTACLE * len(blockers)
+            done = set()
             for bi in hazards:
-                p = s.pos[bi]
-                if colds:
-                    v += self.HAZARD + min(t.walk(m, p).get(c, 50) for c in colds)
-                else:
-                    v += self.HAZARD + self.NO_COLD
+                hot_group = groups[s.glue[bi]][0]
+                if hot_group in done:
+                    continue
+                done.add(hot_group)
+                v += self.HAZARD + self._cooling(m, s, t, hot_group, carriers)
             if v < best:
                 best = v
         if best == INF and t.cap < INF:
@@ -208,11 +213,55 @@ class Pruner:
         return best
 
     @staticmethod
-    def _burning(m, s, occ, cell, members, moved_to):
+    def _cells(m, s, members):
+        return [(s.pos[j][0] + cx, s.pos[j][1] + cy)
+                for j in members if s.pos[j] is not None for cx, cy in m.bodies[j].cells]
+
+    def _carriers(self, m, s, groups):
+        """(cold sources, cold movable groups, neutral movable groups) for cooling estimates.
+        A group entry is (cells, opaque cell count)."""
+        sources, cold, neutral = [], [], []
+        for rep, (members, immovable) in groups.items():
+            bodies = [j for j in members if s.pos[j] is not None and not m.bodies[j].outside]
+            if not bodies:
+                continue
+            temps = {s.temp[j] for j in bodies if m.bodies[j].weight}
+            cells = self._cells(m, s, bodies)
+            weight = sum(m.bodies[j].weight for j in bodies)
+            if COLD in temps:
+                sources += cells
+                if not immovable:
+                    cold.append((cells, weight))
+            elif temps == {0} and not immovable and \
+                    any(f != INSULATED for j in bodies for fs in m.bodies[j].faces for f in fs):
+                neutral.append((cells, weight))
+        return sources, cold, neutral
+
+    def _cooling(self, m, s, t, hot_group, carriers):
+        """Rough cost of bringing enough cold to a hot group: an existing cold block walked
+        over, or a neutral block chilled at a cold source first and then walked over."""
+        sources, cold, neutral = carriers
+        if not sources:
+            return self.NO_COLD
+        hot_cells = self._cells(m, s, hot_group)
+        need = sum(m.bodies[j].weight for j in hot_group if s.pos[j] is not None)
+
+        def dist(cells_a, cells_b):
+            return min((t.walk(m, a).get(b, 50) for a in cells_a for b in cells_b), default=50)
+        best = INF
+        for cells, weight in cold:
+            best = min(best, dist(cells, hot_cells) + (0 if weight >= need else self.TOO_WEAK))
+        src_to_hot = dist(sources, hot_cells)
+        for cells, weight in neutral:
+            best = min(best, dist(cells, sources) + src_to_hot + self.CHILL
+                       + (0 if weight >= need else self.TOO_WEAK))
+        return best if best < INF else self.NO_COLD
+
+    @staticmethod
+    def _burning(m, s, occ, cell, members, shift):
         """Hot bodies whose conductive face would touch a demon standing on cell, with the
-        candidate (members) already moved so that its origin is at moved_to."""
+        candidate (members) displaced by shift from where it is now."""
         found = set()
-        shift = (moved_to[0] - cell[0], moved_to[1] - cell[1])
         for i, (dx, dy) in enumerate(DIRS):
             n = (cell[0] + dx, cell[1] + dy)
             # the candidate's own cells, at their new place
