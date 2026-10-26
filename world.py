@@ -20,13 +20,15 @@ Rules from the w3 tutorial texts (the Chinese texts are the precise ones) and th
     enter-2       Entering the level you are in keeps its state; the demon reappears at the start.
     enter-3       Levels left by entering another one keep their state until something exits.
     transition-1  No heat transfer at the moment of entering or exiting.
-    transition-2  A block where the demon appears (on entering or exiting) is destroyed.
+    transition-2  A block where the demon appears (on entering or exiting) is destroyed. This
+                  includes wall cells, pinned ones too (w3/path: the demon comes out into a
+                  wall and opens a closed room); a destroyed wall cell becomes a hole.
     transition-3  Entering: the outside temperature is that of the level block entered.
                   Exiting: the outside temperature of the level you are now in becomes neutral.
     goal          Solving a level leaves it at once (an automatic exit).
 Assumed here: the demon appears next to the real block's initial position (exiting initialises
-the parent first), cannot appear inside a boundary wall, and may pick any adjacent level block
-to enter (the game enters the one with the lowest number). Levels whose real chain does not go
+the parent first) but never outside the grid, and may pick any adjacent level block to enter
+(the game enters the one with the lowest number). Levels whose real chain does not go
 through the level being solved cannot be entered (that would leave the puzzle).
 """
 from typing import NamedTuple
@@ -197,16 +199,15 @@ class World:
 
     @staticmethod
     def _appear(m, s, cell):
-        """Put the demon on cell without heat transfer, destroying a block standing there."""
+        """Put the demon on cell without heat transfer, destroying a block standing there,
+        wall cells included (pinned or not; w3/path needs it)."""
         if not m.inside(cell):
             return None
-        hit = m.occupancy(s).get(cell)
-        if hit is not None:
-            if m.bodies[hit[0]].outside:
-                return None
-            s = m.destroy(s, hit[0])
+        if cell in m.occupancy(s):
+            s = m.destroy(s, cell)
         return s._replace(demon=cell, demon_temp=sim.NEUTRAL)
 
     @staticmethod
     def _is_initial(m, s):
-        return s.pos == m.initial_pos and s.temp == m.initial_temp and s.glue == m.initial_glue
+        return (s.pos == m.initial_pos and s.temp == m.initial_temp and s.glue == m.initial_glue
+                and not s.holes)

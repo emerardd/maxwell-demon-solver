@@ -43,14 +43,16 @@ def chains(node, path):
 
 
 def block_in(parent_id, lid):
+    """The real level block (flag 1) for lid in the parent, else any block for it."""
     parent = levels.get(parent_id)
     if not parent:
         return None
-    for y, row in enumerate(parent.grid):
-        for x, o in enumerate(row):
-            if isinstance(o, mxw.LevelBlock) and o.id == lid:
-                return parent, x, y
-    return None
+    found = [(o.flag, x, y) for y, row in enumerate(parent.grid) for x, o in enumerate(row)
+             if isinstance(o, mxw.LevelBlock) and o.id == lid]
+    if not found:
+        return None
+    _, x, y = max(found)
+    return parent, x, y
 
 
 where = {}

@@ -43,6 +43,7 @@ class State(NamedTuple):
     pos: tuple          # origin per body, None once destroyed
     temp: tuple         # temperature per body
     glue: tuple         # per body, the smallest body index of its glued group
+    holes: frozenset = frozenset()  # destroyed cells of fixed bodies (walls), now empty
 
 
 class Model:
@@ -172,16 +173,22 @@ class Model:
             self._members_cache[glue] = g
         return g
 
-    def destroy(self, s, bi):
-        """Remove body bi (w3/transition-2); its former group splits where it is now broken."""
+    def destroy(self, s, cell):
+        """Destroy the block on cell (w3/transition-2). A movable or single-cell body goes away
+        and its former group splits where it is now broken; a cell of a larger fixed body (a
+        wall) becomes a hole, pinned or not, as seen in the game (w3/path)."""
+        bi, _ = self.occupancy(s)[cell]
+        if self.bodies[bi].fixed and len(self.bodies[bi].cells) > 1:
+            holes = s.holes | {cell}
+            return s._replace(holes=holes, glue=self._glue(s.pos, s.glue, holes))
         pos = tuple(None if j == bi else p for j, p in enumerate(s.pos))
-        return s._replace(pos=pos, glue=self._glue(pos, tuple(range(len(pos)))))
+        return s._replace(pos=pos, glue=self._glue(pos, tuple(range(len(pos))), s.holes))
 
     def stuck(self, s, bi):
         """Is body bi glued into a group that can never move?"""
         return self.groups(s.glue)[s.glue[bi]][1]
 
-    def _glue(self, pos, glue):
+    def _glue(self, pos, glue, holes=frozenset()):
         """Join groups wherever a sticky face touches another body."""
         parent = list(glue)
 
@@ -190,36 +197,56 @@ class Model:
                 parent[a] = parent[parent[a]]
                 a = parent[a]
             return a
+
+        def join(a, b):
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[max(ra, rb)] = min(ra, rb)
         occ = None
         for bi, faces in enumerate(self.sticky):
             p = pos[bi]
             if not faces or p is None:
                 continue
             if occ is None:
-                occ = self._occupancy(pos)
+                occ = self._occupancy(pos, holes)
             for cx, cy, i in faces:
                 hit = occ.get((p[0] + cx + DIRS[i][0], p[1] + cy + DIRS[i][1]))
                 if hit is not None:
-                    ra, rb = find(bi), find(hit[0])
-                    if ra != rb:
-                        parent[max(ra, rb)] = min(ra, rb)
+                    join(bi, hit[0])
+        # The faces around a hole point into the wall's own cells, so they are not in
+        # self.sticky; a body standing in a hole sticks to the sticky faces around it.
+        if holes:
+            occ = occ or self._occupancy(pos, holes)
+            for hx, hy in holes:
+                here = occ.get((hx, hy))
+                if here is None:
+                    continue
+                for i, (dx, dy) in enumerate(DIRS):
+                    hit = occ.get((hx + dx, hy + dy))
+                    if hit is not None and hit[0] != here[0] and \
+                            self.bodies[hit[0]].faces[hit[1]][OPP[i]] == STICKY:
+                        join(here[0], hit[0])
         return tuple(find(a) for a in range(len(parent)))
 
     def occupancy(self, s):
-        return self._occupancy(s.pos)
+        return self._occupancy(s.pos, s.holes)
 
-    def _occupancy(self, pos):
-        """{cell: (body, cell index)}; cached per position tuple. Callers must not mutate it."""
-        occ = self._occ_cache.get(pos)
+    def _occupancy(self, pos, holes=frozenset()):
+        """{cell: (body, cell index)}; cached per position tuple and holes. Callers must not
+        mutate it."""
+        key = (pos, holes)
+        occ = self._occ_cache.get(key)
         if occ is None:
             occ = {}
             for bi, p in enumerate(pos):
                 if p is not None:
                     for k, (dx, dy) in enumerate(self.bodies[bi].cells):
-                        occ[(p[0] + dx, p[1] + dy)] = (bi, k)
+                        c = (p[0] + dx, p[1] + dy)
+                        if c not in holes:
+                            occ[c] = (bi, k)
             if len(self._occ_cache) > 50_000:
                 self._occ_cache.clear()
-            self._occ_cache[pos] = occ
+            self._occ_cache[key] = occ
         return occ
 
     # -- rules ---------------------------------------------------------------------------
@@ -257,8 +284,8 @@ class Model:
                             frontier.append(glue[hit[0]])
             pos = tuple((p[0] + dx, p[1] + dy) if p is not None and glue[bi] in moving else p
                         for bi, p in enumerate(pos))
-            glue = self._glue(pos, glue)
-        return self.heat(State(target, s.demon_temp, pos, s.temp, glue))
+            glue = self._glue(pos, glue, s.holes)
+        return self.heat(s._replace(demon=target, pos=pos, glue=glue))
 
     def heat(self, s):
         """Heat-transfer phase: each conduction component takes the majority temperature."""
@@ -273,24 +300,28 @@ class Model:
             return a
         occ = self.occupancy(s)
         bodies, conductive = self.bodies, self.conductive
-        demon_cell = s.demon
         for bi, p in enumerate(s.pos):
             if p is None:
                 continue
             px, py = p
             for cx, cy, i in conductive[bi]:
                 dx, dy = DIRS[i]
-                nb = (px + cx + dx, py + cy + dy)
-                if nb == demon_cell:
-                    bj = demon
-                else:
-                    hit = occ.get(nb)
-                    if hit is None:
-                        continue
-                    bj, kj = hit
-                    if bj == bi or bodies[bj].faces[kj][OPP[i]] == INSULATED:
-                        continue
+                hit = occ.get((px + cx + dx, py + cy + dy))
+                if hit is None:
+                    continue
+                bj, kj = hit
+                if bj == bi or bodies[bj].faces[kj][OPP[i]] == INSULATED:
+                    continue
                 ra, rb = find(bi), find(bj)
+                if ra != rb:
+                    parent[ra] = rb
+        # The demon touches every neighbouring face that is not insulated (also the faces
+        # around a hole it stands in, which are not in self.conductive).
+        dxy = s.demon
+        for i, (dx, dy) in enumerate(DIRS):
+            hit = occ.get((dxy[0] + dx, dxy[1] + dy))
+            if hit is not None and bodies[hit[0]].faces[hit[1]][OPP[i]] != INSULATED:
+                ra, rb = find(hit[0]), find(demon)
                 if ra != rb:
                     parent[ra] = rb
         comps = {}
@@ -316,7 +347,7 @@ class Model:
                     demon_temp = t
                 elif not outside[a]:
                     temp[a] = t
-        return State(s.demon, demon_temp, s.pos, tuple(temp), s.glue)
+        return s._replace(demon_temp=demon_temp, temp=tuple(temp))
 
     def won(self, s):
         if s.demon_temp == HOT or not self.goals:

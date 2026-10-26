@@ -372,6 +372,26 @@ class Transitions(unittest.TestCase):  # w3 texts
         self.assertEqual(sum(p is not None for p in h.top.pos), sum(
             p is not None for p in w.current(h).initial_pos) - 1)
 
+    def test_coming_out_into_a_wall_breaks_it(self):  # transition-2, seen in the game (w3/path)
+        # T: A's real block has a wall on its right and a closed room behind that wall.
+        # Re-entering A through a shortcut moving left makes the exit come out on the right of
+        # the real block: inside the wall, which breaks and opens the room.
+        w = self.make(T=(['#######',
+                          '#@.A#.#',
+                          '#...#.#',
+                          '#######'], {'A': 'A'}),
+                      A=(['#####',
+                          '#.C@#',
+                          '#####'], {'C': '~A'}))
+        h = w.enter(self.walk(w, w.start('T'), R), R)   # into A moving right
+        h = w.enter(h, L)                               # A again, through the shortcut, moving left
+        self.assertEqual(h.path[-1].dir, L)
+        h = w.quit(h)
+        self.assertEqual(h.top.demon, (4, 1))           # right of the real block: in the wall
+        self.assertIn((4, 1), h.top.holes)
+        h = w.step(h, R)                                # and on into the closed room
+        self.assertEqual(h.top.demon, (5, 1))
+
     def test_no_heat_exchange_at_all_until_the_next_move(self):  # transition-1
         # on coming out, P is back in its initial layout, where a hot and a neutral block touch:
         # neither the demon nor those blocks exchange heat until the next move
@@ -581,8 +601,7 @@ class Sticky(unittest.TestCase):  # w2/sticky-1..3
         m = sim.Model(build(['########',
                              '#.@oo..#',
                              '########'], faces))
-        s = m.initial()
-        s = m.destroy(s, m.occupancy(s)[(3, 1)][0])
+        s = m.destroy(m.initial(), (3, 1))
         self.assertNotIn((3, 1), m.occupancy(s))
         s = m.step(m.step(s, R), R)                   # walk up to the survivor and push it
         self.assertIn((5, 1), m.occupancy(s))
@@ -681,10 +700,12 @@ class GameData(unittest.TestCase):
     # Tutorial levels the current search cannot finish quickly; checked only by run_world.py.
     KNOWN_SLOW = {'eadb3d02'}  # w1/insulated-2
     # Not solvable under the current rules, open question (see README).
-    UNRESOLVED = {'0d33f295', '9de258d5', '601b40f2'}  # w3/path
+    UNRESOLVED = set()
     # Tutorial levels only solvable in the context they are met in.
     CONTEXT = {'8d2fdcfc': dict(solved=frozenset({'394c69e4'}), t_out=COLD),  # via a cold block
-               'b0e93052': dict(scope='1bfecdfb')}  # only met inside 1bfecdfb
+               'b0e93052': dict(scope='1bfecdfb'),  # only met inside 1bfecdfb
+               '9de258d5': dict(scope='0d33f295'),  # w3/path: needs walls of 0d33f295 broken
+               '601b40f2': dict(scope='0d33f295')}
 
     def test_tutorial_levels_solve_and_replay(self):
         import run_world
