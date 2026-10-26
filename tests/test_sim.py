@@ -732,8 +732,8 @@ class GameData(unittest.TestCase):
         cls.levels, cls.structure, cls.errors = mxw.load_world(GAME)
 
     def test_parser_coverage(self):
-        self.assertGreaterEqual(len(self.levels), 1149)
-        self.assertLessEqual(set(self.errors), {'16fa52fc', '5aa8419e', '7960b275', '88abb570'})
+        self.assertEqual(len(self.levels), 1153)
+        self.assertEqual(self.errors, {})
 
     # Tutorial levels the current search cannot finish quickly; checked only by catalog.py.
     KNOWN_SLOW = set()

@@ -52,6 +52,18 @@ python -m unittest discover -s tests
 
 批量求解很耗时，在后台跑并把日志写进 `logs/`。
 
+## GitHub 上的相关项目（2026-10 查询）
+
+目前没有找到其他求解器，相关的项目有这些：
+
+| 项目 | 内容 | 对本项目的价值 |
+|---|---|---|
+| [MatttNguyen/mpd-leditor](https://github.com/MatttNguyen/mpd-leditor) | 关卡编辑器（Godot），能读写 `.mxw` | 它的 `level_dat.gd` 让我们修正了 tag `05` 的长度，全部 1153 个关卡文件都能解析了 |
+| [azaaz-1/CustomizableSokoban](https://github.com/azaaz-1/CustomizableSokoban) | Godot / C# 复刻，含活塞（`Piston.cs`）、热传导、推动规则 | 做 w4 活塞时可以参考它对活塞嵌套、粘性的处理 |
+| [WYXkk/Maxwell-s-TAS-demon](https://github.com/WYXkk/Maxwell-s-TAS-demon) | TAS 工具：把 `wasd`/`e`/`q` 文本按时间间隔发给游戏 | 可以把求解器的解法直接导出成它的脚本，自动在游戏里回放验证 |
+| [Jorrrmungandr/maxwells-puzzling-demon](https://github.com/Jorrrmungandr/maxwells-puzzling-demon) | Web 版复刻（TypeScript），实现了推动和冷热传导 | 参考价值有限 |
+| [qiekn/maxwells-puzzling-demon](https://github.com/qiekn/maxwells-puzzling-demon) | Unity 复刻练习，已停更 | 参考价值有限 |
+
 ## 文档
 
 - [docs/format.md](docs/format.md)：游戏数据格式、关卡树、内部 id

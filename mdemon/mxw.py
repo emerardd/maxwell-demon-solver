@@ -1,6 +1,7 @@
 """Parser for Maxwell's puzzling demon level files (world/*.mxw).
 
-Reverse-engineered from the shipped data; 1149/1153 files parse with no leftover bytes.
+Reverse-engineered from the shipped data; all 1153 files parse with no leftover bytes (the
+length of tag 05 comes from MatttNguyen/mpd-leditor, a level editor for the game).
 Fields marked (?) are hypotheses that still need checking against the game.
 
 File layout
@@ -17,7 +18,7 @@ Object (tag byte first)
     02 attr sides           block
     03 flag cstr id A B     level block; A/B = block objects for unsolved/solved state
     04 st body prio [head]  piston; head object present only when st bit0 == 0 (expanded)
-    05 attr sides x         piston head variant with an extra byte (?)
+    05 attr sides x y       piston head variant with two extra bytes (meaning unknown)
 
 attr bits (?)   bit0 fixed pin, bit1 stores heat (0 = transparent), bit2 hot, bit3 cold,
                 bit2+bit3 = 4th ("retentive") temperature
@@ -76,7 +77,7 @@ class Piston:
 class Head:
     attr: int
     sides: int
-    extra: int
+    extra: tuple  # two bytes, meaning unknown
 
 
 @dataclass
@@ -132,8 +133,8 @@ def parse(buf, level_id=''):
             prio = u8()
             head = obj() if not st & 1 else None
             return Piston(st, body, prio, head)
-        if tag == 5:
-            return Head(u8(), u8(), u8())
+        if tag == 5:  # 5 bytes long, as in MatttNguyen/mpd-leditor's level_dat.gd
+            return Head(u8(), u8(), (u8(), u8()))
         raise FormatError(f'unknown tag {tag:#x} at offset {p - 1}')
 
     w, h = u8(), u8()
