@@ -714,8 +714,8 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
     def test_pulling_a_stuck_block_out_cools_the_piston(self):  # piston-passive-2
         # the content is stuck to the movable side and to the block in front, which is stuck
         # to the block the demon pushes up. Cold and extended, the piston contracts in the
-        # same turn and, as nothing else lets it, pulls the blocks back, pushing the demon
-        # back down.
+        # same turn; pulling the blocks back would push the demon, so the piston moves up
+        # over its old content instead.
         m = piston(['######',
                     '#....#',
                     '#....#',
@@ -729,9 +729,9 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         self.assertEqual(moved[1][m.pindex[pis]], (True, -1))  # pulled out: extended, cold
         self.assertEqual(moved[2][pis], COLD)
         s = m.step(s, U)
-        self.assertEqual(s.demon, (2, 4))
-        self.assertEqual(s.pos[pis], (3, 4))
-        self.assertEqual(self.state(m, s, (3, 4)), (False, True))
+        self.assertEqual(s.demon, (2, 3))
+        self.assertEqual(s.pos[pis], (3, 3))
+        self.assertEqual(self.state(m, s, (3, 3)), (False, True))
         self.assertEqual(s.temp[pis], NEUTRAL)
 
     def test_pushed_piston_slides_over_a_blocked_block(self):  # seen in the game (w4-3 hint)
@@ -747,6 +747,22 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         self.assertEqual(self.state(m, s, (2, 3)), (False, True))
         self.assertEqual(temp_at(m, s, (2, 3)), NEUTRAL)
         self.assertEqual(temp_at(m, s, (1, 3)), NEUTRAL)
+
+    def test_piston_pulled_off_its_held_content_extends_and_cools(self):  # w4-16, seen in the game
+        # the demon pushes the block glued to the back of a contracted piston away from its
+        # open front; the content is stuck to the movable side and glued to a block stuck to
+        # the wall, so it stays: the piston is pulled out and cools
+        m = piston(['#######',
+                    '#.@...#',
+                    '#o.o..#',
+                    '#######'], (2, 2), L, False, slot=block((S, I, S, I)),
+                   faces={(1, 2): (S, I, S, I), (3, 2): (S, P, P, P)})
+        pis = m.occupancy(m.initial())[(2, 2)][0]
+        s = m.initial()
+        r = m._pull_off(s, R, m.occupancy(s)[(3, 2)][0])
+        self.assertEqual(r[0][pis], (3, 2))
+        self.assertEqual(r[1][m.pindex[pis]], (True, -1))
+        self.assertEqual(r[2][pis], COLD)
 
     def test_lower_number_acts_first(self):  # turn-2, piston priority
         # two hot empty pistons both extend, one step each, lowest number first

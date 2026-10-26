@@ -525,7 +525,7 @@ class Model:
             x, y = s.pos[P]
             hit = occ.get((x + DIRS[d][0], y + DIRS[d][1]))
             if hit is None or hit[0] in self.pdir or len(self.bodies[hit[0]].cells) > 1 or \
-                    self.bodies[hit[0]].fixed:
+                    self.stuck(s, hit[0]):
                 continue
             a = hit[0]
             r = self._move(s, d, [seed], held=(a,), envelop=(P, a))
@@ -538,12 +538,34 @@ class Model:
             return pos, pist[:k] + ((False, a),) + pist[k + 1:], temp, demon
         return None
 
+    def _pull_off(self, s, d, seed):
+        """The push of seed in direction d is blocked: a contracted piston moving away from its
+        open front leaves its content behind if that is held. Stuck to the movable side, the
+        content pulls it out (extends, -1 temperature); otherwise the piston comes away empty.
+        Seen in the game (w4-16). (pos, pist, temp, demon) or None."""
+        for P, (ext, c) in zip(self.pistons, s.pist):
+            if ext or c < 0 or OPP[self.pdir[P]] != d:
+                continue
+            r = self._move(s, d, [seed], held=(c,), detach=P)
+            if r is None or r[0][P] == s.pos[P]:
+                continue
+            pos, pist, temp, demon = r
+            k = self.pindex[P]
+            if self._links(s.pos, s.holes, s.pist).get(P) == c:
+                new = (True, -1)
+                temp = temp[:P] + (self._passive(P, temp[P], -1),) + temp[P + 1:]
+            else:
+                new = (False, -1)
+            return pos, pist[:k] + (new,) + pist[k + 1:], temp, demon
+        return None
+
     def _actuate(self, s, P):
         """The move phase of piston P acting (hot contracted: extends; cold extended:
         contracts). The new state before heat transfer, or None when it is blocked.
         Extending pushes the content out, or else moves the piston back off it; contracting
-        pulls a block stuck to the movable side in, and is blocked if that block cannot come
-        (w4/piston-active-3: the piston does not move over it, unlike when pushed). Only
+        pulls a block stuck to the movable side in, or else moves the piston over it, unless
+        that block is held by something fixed: "fixed blocks cannot be pulled in" (w0/fixed;
+        w4/piston-active-3 is blocked, w4-16 moves over). Only
         when nothing works without pushing the demon is the demon pushed away (seen in the
         game: w4-2 moves the piston back rather than the demon, 1ef673fc and w4-2's first
         press push the demon, the piston being stuck)."""
@@ -567,7 +589,9 @@ class Model:
                 return None
             else:
                 r = next(filter(None, (
-                    self._move(s, OPP[front], [a], held=(P,), demon=how)
+                    self._move(s, OPP[front], [a], held=(P,), demon=how) or
+                    (None if self.stuck(s, a) else
+                     self._move(s, front, [P], held=(a,), demon=how, envelop=(P, a)))
                     for how in ('block', 'push'))), None)
         if r is None:
             return None
@@ -638,7 +662,8 @@ class Model:
         occ = self.occupancy(s)
         if self.pistons:
             if target in occ:
-                r = self._move(s, d, [occ[target][0]]) or self._envelop(s, d, occ[target][0])
+                seed = occ[target][0]
+                r = self._move(s, d, [seed]) or self._envelop(s, d, seed) or self._pull_off(s, d, seed)
                 if r is None:
                     return None
                 pos, pist, temp, _ = r
