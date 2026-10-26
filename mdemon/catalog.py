@@ -1,7 +1,7 @@
 """Worlds and their level lists, from structure.json."""
 from . import mxw
 
-WORLDS = {'w1': '9a498c50', 'w2': '6c1848b0', 'w3': '214a0e55'}
+WORLDS = {'w1': '9a498c50', 'w2': '6c1848b0', 'w3': '214a0e55', 'w4': 'f1164388'}
 KINDS = (('normalSublevels', 'normal'), ('extraSublevels', 'extra'), ('hintSublevels', 'hint'))
 
 

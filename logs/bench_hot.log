@@ -1,1 +1,12 @@
 a07a480b B informed  w=3   : TIMEOUT     90.0s   88,440 states  
+a07a480b C informed  greedy: TIMEOUT     90.0s   94,014 states  
+74d1628e B informed  w=3   : TIMEOUT     90.0s   91,551 states  
+74d1628e C informed  greedy: TIMEOUT     90.0s   97,881 states  
+5fe1b337 B informed  w=3   : TIMEOUT     90.0s   34,753 states  
+5fe1b337 C informed  greedy: TIMEOUT     90.0s   34,080 states  
+900ca6ab B informed  w=3   : TIMEOUT     90.0s   49,010 states  
+900ca6ab C informed  greedy: TIMEOUT     90.0s   41,071 states  
+0813d109 B informed  w=3   : TIMEOUT     90.0s   86,625 states  
+0813d109 C informed  greedy: TIMEOUT     90.0s   89,924 states  
+8c6934a2 B informed  w=3   : TIMEOUT     90.0s   44,767 states  
+8c6934a2 C informed  greedy: TIMEOUT     90.0s   45,429 states  

@@ -153,10 +153,9 @@ class World:
         if s.demon_temp == sim.HOT:
             return None
         cell = (s.demon[0] + sim.DIRS[d][0], s.demon[1] + sim.DIRS[d][1])
-        hit = m.occupancy(s).get(cell)
-        if hit is None:
+        bi = m.front_body(s, cell, d)
+        if bi is None:
             return None
-        bi = hit[0]
         lid = m.bodies[bi].level_id
         if not lid or lid not in self.levels:
             return None
@@ -205,9 +204,11 @@ class World:
             return None
         if cell in m.occupancy(s):
             s = m.destroy(s, cell)
+            if s is None:
+                return None
         return s._replace(demon=cell, demon_temp=sim.NEUTRAL)
 
     @staticmethod
     def _is_initial(m, s):
         return (s.pos == m.initial_pos and s.temp == m.initial_temp and s.glue == m.initial_glue
-                and not s.holes)
+                and not s.holes and s.pist == m.initial_pist)

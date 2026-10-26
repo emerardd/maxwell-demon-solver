@@ -20,7 +20,7 @@ for lv in levels.values():
         elif isinstance(o, mxw.LevelBlock):
             f.add('levelblock'); walk(o.unsolved); walk(o.solved)
         elif isinstance(o, mxw.Piston):
-            f.add('piston'); walk(o.body); walk(o.head)
+            f.add('piston'); walk(o.body); walk(o.slot)
     cnt = [0]
     def n_add(): cnt[0] += 1
     for row in lv.grid:

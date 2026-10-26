@@ -121,6 +121,8 @@ class Solver:
         Anywhere else at least one more step is needed, and nothing is pruned."""
         if len(h.path) == 1 and h.path[0].lid == self.target:
             m = self.world.current(h)
+            if m.pistons:
+                return 1  # the push tables know nothing of blocks moved by pistons
             if self.heuristic == 'informed':
                 return self.pruner.informed(m, h.top)
             return self.pruner.h(m, h.top)
@@ -133,23 +135,27 @@ class Solver:
     # -- inert walking ---------------------------------------------------------------------
     @staticmethod
     def _in_equilibrium(m, s):
-        return m.heat(s._replace(demon=(-9, -9))).temp == s.temp
+        return m.heat(s._replace(demon=(-9, -9))).temp == s.temp and not m.triggered(s)
 
     @staticmethod
     def _inert(m, s, occ, c):
         """Would standing on empty cell c leave every temperature unchanged and the demon safe?"""
         seen = None
-        for i, (dx, dy) in enumerate(sim.DIRS):
-            n = (c[0] + dx, c[1] + dy)
-            if n in occ:
-                bi, k = occ[n]
-                body = m.bodies[bi]
-                if body.faces[k][sim.OPP[i]] == sim.INSULATED:
-                    continue
-                t = m.t_out if body.outside else s.temp[bi]
-                if t == sim.HOT or (seen is not None and t != seen):
-                    return False
-                seen = t
+        if m.pistons:
+            touched = m.touching(s, c)
+        else:
+            touched = []
+            for i, (dx, dy) in enumerate(sim.DIRS):
+                hit = occ.get((c[0] + dx, c[1] + dy))
+                if hit is not None:
+                    touched.append((hit[0], m.bodies[hit[0]].faces[hit[1]][sim.OPP[i]]))
+        for bi, face in touched:
+            if face == sim.INSULATED:
+                continue
+            t = m.t_out if m.bodies[bi].outside else s.temp[bi]
+            if t == sim.HOT or (seen is not None and t != seen):
+                return False
+            seen = t
         return True
 
     def _region(self, m, s, occ, fold):
@@ -169,8 +175,8 @@ class Solver:
 
     def _canonical(self, m, s, settled=False):
         """Dedup key: the state with the demon moved to the smallest cell of its inert region."""
-        if s.demon_temp == sim.HOT or not (settled or self._in_equilibrium(m, s)):
-            return s
+        if s.demon_temp == sim.HOT or not (settled or self._in_equilibrium(m, s)) or                 (m.pistons and m.triggered(s)):
+            return s  # a piston held back by the demon may act once it walks away
         occ = m.occupancy(s)
         if not self._inert(m, s, occ, s.demon):
             return s
@@ -192,7 +198,7 @@ class Solver:
         if s.demon_temp == sim.HOT:
             return
         occ = m.occupancy(s)
-        fold = (settled or self._in_equilibrium(m, s)) and self._inert(m, s, occ, s.demon)
+        fold = (settled or self._in_equilibrium(m, s)) and self._inert(m, s, occ, s.demon) and             not (m.pistons and m.triggered(s))
         region = self._region(m, s, occ, fold)
         depth = len(h.path)
         for c in region:

@@ -16,7 +16,9 @@ def cell(o):
     if isinstance(o, mxw.LevelBlock):
         return f'L{o.id[:4]}'.ljust(6)
     if isinstance(o, mxw.Piston):
-        return f'P{o.state}{o.body.attr:x}{o.body.sides:02x}'.ljust(6)[:6]
+        # E/C extended or contracted, arrow = movable side, body attr, + = holds a block
+        return (f'P{"EC"[not o.extended]}{"^>v<"[o.direction]}{o.body.attr:x}'
+                + ('+' if o.slot is not None else '')).ljust(6)
     return '?'.ljust(6)
 
 

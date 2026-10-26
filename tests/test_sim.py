@@ -629,6 +629,123 @@ class Transparent(unittest.TestCase):  # w2/empty-1, empty-2
         self.assertEqual(temp_at(m, s, (4, 1)), HOT)  # it passes heat, it does not store it
 
 
+def piston(rows, cell, side, extended, attr=2, slot=None, faces=None, prio=0):
+    """A level from rows with a piston on cell (a '.' in rows): movable side towards side
+    (L, D, R, U), insulated there and plain elsewhere; attr 2 neutral, 6 hot, 10 cold; slot:
+    the Block inside a contracted one."""
+    level = build(rows, faces)
+    codes = [P] * 4
+    codes[side] = I
+    body = mxw.Block(attr, sum(c << (2 * i) for i, c in enumerate(codes)))
+    state = int(extended) | ({U: 0, R: 1, D: 2, L: 3}[side] << 1)
+    level.grid[cell[1]][cell[0]] = mxw.Piston(state, body, prio, slot)
+    return sim.Model(level)
+
+
+def block(faces=(P, P, P, P), attr=2):
+    return mxw.Block(attr, sum(c << (2 * i) for i, c in enumerate(faces)))
+
+
+class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
+    def steps(self, m, moves):
+        s = m.initial()
+        for d in moves:
+            s = m.step(s, d)
+        return s
+
+    def state(self, m, s, cell):
+        """(extended, holds a block) of the piston on cell."""
+        ext, c = s.pist[m.pindex[m.occupancy(s)[cell][0]]]
+        return ext, c >= 0
+
+    def test_hot_contracted_piston_pushes_its_block_out(self):  # piston-active-1
+        m = piston(['#######',
+                    '#.....#',
+                    '#@....#',
+                    '#######'], (3, 1), R, False, attr=6, slot=block())
+        s = self.steps(m, [R])
+        self.assertEqual(self.state(m, s, (3, 1)), (True, False))
+        self.assertIn((4, 1), m.occupancy(s))
+        self.assertEqual(s.temp[m.occupancy(s)[(3, 1)][0]], NEUTRAL)
+
+    def test_empty_piston_extends_without_pushing(self):  # seen in the game
+        m = piston(['#######',
+                    '#...o.#',
+                    '#@....#',
+                    '#######'], (3, 1), R, False, attr=6, faces={(4, 1): (I, I, I, I)})
+        s = self.steps(m, [R])
+        self.assertEqual(self.state(m, s, (3, 1)), (True, False))
+        self.assertIn((4, 1), m.occupancy(s))
+
+    def test_cold_extended_piston_pulls_a_stuck_block_in(self):  # piston-active-2, seen in the game
+        m = piston(['########',
+                    '#...O..#',
+                    '#@.....#',
+                    '########'], (3, 1), R, True, attr=10, faces={(4, 1): (S, I, I, I)})
+        s = self.steps(m, [R])
+        self.assertEqual(self.state(m, s, (3, 1)), (False, True))
+        self.assertNotIn((4, 1), m.occupancy(s))
+
+    def test_cold_piston_with_nothing_stuck_just_contracts(self):
+        m = piston(['########',
+                    '#...O..#',
+                    '#@.....#',
+                    '########'], (3, 1), R, True, attr=10)
+        s = self.steps(m, [R])
+        self.assertEqual(self.state(m, s, (3, 1)), (False, False))
+        self.assertIn((4, 1), m.occupancy(s))
+
+    def test_pressing_a_block_in_heats_the_piston(self):  # piston-passive-1
+        # the block goes in and the piston turns hot; it cannot push the block back out
+        # while the demon stands in front and the wall is behind, so it waits
+        m = piston(['######',
+                    '#.@O.#',
+                    '######'], (4, 1), L, True, faces={(3, 1): (I, I, I, I)})
+        s = self.steps(m, [R])
+        self.assertEqual(s.demon, (3, 1))
+        self.assertEqual(self.state(m, s, (4, 1)), (False, True))
+        self.assertEqual(s.temp[m.occupancy(s)[(4, 1)][0]], HOT)
+        s = m.step(s, L)  # the way is free: the piston extends and the block comes out
+        self.assertEqual(self.state(m, s, (4, 1)), (True, False))
+        self.assertIn((3, 1), m.occupancy(s))
+
+    def test_pulling_a_stuck_block_out_cools_the_piston(self):  # piston-passive-2
+        # the content is stuck to the movable side and to the block in front, which is stuck
+        # to the block the demon pushes up. Cold and extended, the piston contracts in the
+        # same turn; the blocks cannot come back (the demon is in the way), so the piston
+        # moves up over its old content instead.
+        m = piston(['######',
+                    '#....#',
+                    '#....#',
+                    '#.oo.#',
+                    '#.@..#',
+                    '######'], (3, 4), U, False, slot=block((I, S, I, S)),
+                   faces={(3, 3): (S, S, I, I), (2, 3): (I, I, P, I)})
+        s = m.initial()
+        pis = m.occupancy(s)[(3, 4)][0]
+        moved = m._move(s, U, [m.occupancy(s)[(2, 3)][0]])
+        self.assertEqual(moved[1][m.pindex[pis]], (True, -1))  # pulled out: extended, cold
+        self.assertEqual(moved[2][pis], COLD)
+        s = m.step(s, U)
+        self.assertEqual(s.pos[pis], (3, 3))
+        self.assertEqual(self.state(m, s, (3, 3)), (False, True))
+        self.assertEqual(s.temp[pis], NEUTRAL)
+
+    def test_lower_number_acts_first(self):  # turn-2, piston priority
+        # two hot empty pistons both extend, one step each, lowest number first
+        level = build(['#######',
+                       '#.....#',
+                       '#@....#',
+                       '#######'])
+        hot = mxw.Block(6, sum(c << (2 * i) for i, c in enumerate((I, I, I, I))))
+        level.grid[1][3] = mxw.Piston(2, hot, 1, None)
+        level.grid[1][5] = mxw.Piston(2, hot, 0, None)
+        m = sim.Model(level)
+        s = m.step(m.initial(), R)
+        self.assertEqual([e for e, _ in s.pist], [True, True])
+        self.assertEqual(m.by_priority, [m.occupancy(s)[(5, 1)][0], m.occupancy(s)[(3, 1)][0]])
+
+
 class SubGoals(unittest.TestCase):
     def test_goal_heuristic_and_start_hooks(self):
         levels = {'P': build(['#######',

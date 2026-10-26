@@ -17,14 +17,15 @@ Object (tag byte first)
     01                      demon start point
     02 attr sides           block
     03 flag cstr id A B     level block; A/B = block objects for unsolved/solved state
-    04 st body prio [head]  piston; head object present only when st bit0 == 0 (expanded)
-    05 attr sides x y       piston head variant with two extra bytes (meaning unknown)
+    04 st body prio [slot]  piston; slot object (the block inside) only when st bit0 == 0
+    05 attr sides x y       5 bytes; seen only as a piston slot outside w4 (meaning unknown)
 
 attr bits (?)   bit0 fixed pin, bit1 stores heat (0 = transparent), bit2 hot, bit3 cold,
                 bit2+bit3 = 4th ("retentive") temperature
 sides           2 bits per side, field0=left, 1=down, 2=right, 3=up;
-                value 0 plain, 1 sticky (?), 2 insulated (?)
-piston st (?)   bit0 contracted, bits1-2 facing direction
+                value 0 sticky, 1 plain (conducts), 2 insulated
+piston st       bit0 extended (0 = contracted, may hold one block), bits1-2 direction of the
+                movable side: 0 up, 1 right, 2 down, 3 left. prio: lower acts first
 """
 from dataclasses import dataclass, field
 import json, os
@@ -65,12 +66,12 @@ class Piston:
     state: int
     body: object
     priority: int
-    head: object = None
+    slot: object = None  # block inside a contracted piston, or None
 
     @property
-    def contracted(self): return bool(self.state & 1)
+    def extended(self): return bool(self.state & 1)
     @property
-    def direction(self): return (self.state >> 1) & 3
+    def direction(self): return (self.state >> 1) & 3  # 0 up, 1 right, 2 down, 3 left
 
 
 @dataclass
@@ -131,8 +132,8 @@ def parse(buf, level_id=''):
             st = u8()
             body = obj()
             prio = u8()
-            head = obj() if not st & 1 else None
-            return Piston(st, body, prio, head)
+            slot = obj() if not st & 1 else None
+            return Piston(st, body, prio, slot)
         if tag == 5:  # 5 bytes long, as in MatttNguyen/mpd-leditor's level_dat.gd
             return Head(u8(), u8(), (u8(), u8()))
         raise FormatError(f'unknown tag {tag:#x} at offset {p - 1}')
