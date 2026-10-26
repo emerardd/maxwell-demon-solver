@@ -628,6 +628,25 @@ class Transparent(unittest.TestCase):  # w2/empty-1, empty-2
         self.assertEqual(temp_at(m, s, (4, 1)), HOT)  # it passes heat, it does not store it
 
 
+class Symmetry(unittest.TestCase):
+    def test_swapped_identical_blocks_give_the_same_key(self):
+        m = sim.Model(build(['#######',
+                             '#@o.o.#',
+                             '#######']))
+        s = m.initial()
+        a, b = (bi for bi, x in enumerate(m.bodies) if not x.fixed)
+        swapped = s._replace(pos=tuple(s.pos[b] if i == a else s.pos[a] if i == b else p
+                                       for i, p in enumerate(s.pos)))
+        self.assertNotEqual(s, swapped)
+        self.assertEqual(m.symmetric_key(s), m.symmetric_key(swapped))
+
+    def test_different_blocks_are_not_swapped(self):
+        m = sim.Model(build(['#######',
+                             '#@o.O.#',
+                             '#######']))
+        self.assertEqual(m.sym_classes, [])
+
+
 class Pruning(unittest.TestCase):
     def h(self, rows, faces=None):
         m = sim.Model(build(rows, faces))

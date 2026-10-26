@@ -70,6 +70,7 @@ class Solver:
         # are not and must be checked).
         start = self._key(h0, False)
         prev, actual, depth, settled = {start: None}, {start: h0}, {start: 0}, {start: False}
+        self.last_search = (prev, actual, depth)  # kept for analysis after a timeout
         tie = count()
         hv = self._h(h0)
         if hv == prune.INF:
@@ -106,7 +107,8 @@ class Solver:
         return 1
 
     def _key(self, h, settled):
-        return h._replace(top=self._canonical(self.world.current(h), h.top, settled))
+        m = self.world.current(h)
+        return h._replace(top=m.symmetric_key(self._canonical(m, h.top, settled)))
 
     # -- inert walking ---------------------------------------------------------------------
     @staticmethod

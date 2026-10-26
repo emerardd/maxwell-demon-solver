@@ -151,6 +151,29 @@ class Model:
                 and (not b.fixed or self.inside((ox + cx + DIRS[i][0], oy + cy + DIRS[i][1])))))
         self.weights = [b.weight for b in self.bodies]
         self.outside = [b.outside for b in self.bodies]
+        # Classes of interchangeable movable bodies (same shape, faces, opacity): swapping two
+        # of them gives the same position in the game. Used for symmetry reduction.
+        kinds = {}
+        for bi, b in enumerate(self.bodies):
+            if not b.fixed and not b.level_id:
+                kinds.setdefault((b.cells, b.faces, b.opaque), []).append(bi)
+        self.sym_classes = [tuple(c) for c in kinds.values() if len(c) > 1]
+
+    def symmetric_key(self, s):
+        """s with the positions and temperatures of interchangeable bodies sorted, for
+        deduplication. Only bodies glued to nothing take part (glue keys on body indices)."""
+        if not self.sym_classes:
+            return s
+        groups = self.groups(s.glue)
+        pos, temp = list(s.pos), list(s.temp)
+        for cls in self.sym_classes:
+            free = [bi for bi in cls if len(groups[s.glue[bi]][0]) == 1]
+            if len(free) < 2:
+                continue
+            vals = sorted(((s.pos[bi] is None, s.pos[bi] or (0, 0), s.temp[bi]) for bi in free))
+            for bi, (gone, p, t) in zip(free, vals):
+                pos[bi], temp[bi] = (None if gone else p), t
+        return s._replace(pos=tuple(pos), temp=tuple(temp))
 
     # -- helpers -------------------------------------------------------------------------
     def inside(self, c):
