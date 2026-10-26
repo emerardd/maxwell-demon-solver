@@ -23,12 +23,14 @@ import prune, sim, world
 class Solver:
     """time_budget (seconds) bounds one solve(); progress(level_id, states, queued, depth) is
     called every 20k states if given. h_weight > 1 turns A* into weighted A*: faster, plans no
-    longer guaranteed shortest."""
+    longer guaranteed shortest. heuristic='informed' uses prune.Pruner.informed, which is not
+    admissible either: it trades plan length for guidance."""
 
     def __init__(self, levels, max_states=2_000_000, weight='cell', time_budget=None, progress=None,
-                 h_weight=1, max_depth=6):
+                 h_weight=1, max_depth=6, heuristic='admissible'):
         self.levels, self.max_states, self.max_depth = levels, max_states, max_depth
         self.time_budget, self.progress, self.h_weight = time_budget, progress, h_weight
+        self.heuristic = heuristic
         self.world = world.World(levels, weight, max_depth)
         self.pruner, self.pruned = prune.Pruner(), 0
         self.target = None  # level being solved in the current solve()
@@ -103,7 +105,10 @@ class Solver:
         """Push-distance bound while in the level being solved (INF marks a dead state).
         Anywhere else at least one more step is needed, and nothing is pruned."""
         if len(h.path) == 1 and h.path[0].lid == self.target:
-            return self.pruner.h(self.world.current(h), h.top)
+            m = self.world.current(h)
+            if self.heuristic == 'informed':
+                return self.pruner.informed(m, h.top)
+            return self.pruner.h(m, h.top)
         return 1
 
     def _key(self, h, settled):
@@ -203,6 +208,25 @@ class Solver:
             node, step = prev[node]
             chunks.append(step)
         return [s for chunk in reversed(chunks) for s in chunk]
+
+
+def solve_any(levels, lid, budget, **ctx):
+    """Find any plan: the guided search first (fast on heat puzzles, not shortest), then
+    shortest-plan A* (better inside nested levels, where the guidance is blind).
+    Returns (solver used, plan, solved set) or None; raises TimeoutError if both run out."""
+    timed_out = False
+    for kw, share in ((dict(heuristic='informed', h_weight=3), 0.5), (dict(), 1.0)):
+        sv = Solver(levels, time_budget=budget * share, **kw)
+        try:
+            r = sv.solve(lid, **ctx)
+        except TimeoutError:
+            timed_out = True
+            continue
+        if r is not None:
+            return sv, r[0], r[1]
+        if not timed_out:
+            return None  # searched to the end: no plan
+    raise TimeoutError(f'no plan for {lid} within {budget:g}s')
 
 
 def replay(solver, lid, plan, solved=frozenset(), t_out=sim.NEUTRAL, scope=None):

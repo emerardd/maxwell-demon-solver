@@ -717,7 +717,7 @@ class GameData(unittest.TestCase):
         self.assertLessEqual(set(self.errors), {'16fa52fc', '5aa8419e', '7960b275', '88abb570'})
 
     # Tutorial levels the current search cannot finish quickly; checked only by run_world.py.
-    KNOWN_SLOW = {'eadb3d02'}  # w1/insulated-2
+    KNOWN_SLOW = set()
     # Not solvable under the current rules, open question (see README).
     UNRESOLVED = set()
     # Tutorial levels only solvable in the context they are met in.
@@ -728,7 +728,6 @@ class GameData(unittest.TestCase):
 
     def test_tutorial_levels_solve_and_replay(self):
         import run_world
-        sv = solver.Solver(self.levels, time_budget=30)
         for world in ('w1', 'w2', 'w3'):
             for kind, lid in run_world.world_levels(self.structure, self.levels, world):
                 if kind != 'hint' or not any(t[2].startswith(world + '/') for t in self.levels[lid].texts):
@@ -737,9 +736,10 @@ class GameData(unittest.TestCase):
                     continue
                 ctx = self.CONTEXT.get(lid, {})
                 with self.subTest(level=lid):
-                    r = sv.solve(lid, **ctx)
+                    r = solver.solve_any(self.levels, lid, 30, **ctx)  # any plan will do here
                     self.assertIsNotNone(r)
-                    self.assertTrue(solver.replay(sv, lid, r[0], **ctx)[0])
+                    sv, plan, _ = r
+                    self.assertTrue(solver.replay(sv, lid, plan, **ctx)[0])
 
     def test_context_levels_need_their_context(self):
         sv = solver.Solver(self.levels, time_budget=30)

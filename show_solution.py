@@ -14,8 +14,8 @@ LEGEND = ('# 墙  @ 恶魔(& = 被烫)  o 中性块  H 热块  C 冷块  t 透�
 
 levels = mxw.load_world(sys.argv[1])[0]
 lid = sys.argv[2]
-sv = solver.Solver(levels, time_budget=float(sys.argv[3]) if len(sys.argv) > 3 else 60)
-plan, _ = sv.solve(lid)
+budget = float(sys.argv[3]) if len(sys.argv) > 3 else 60
+sv, plan, _ = solver.solve_any(levels, lid, budget)
 assert solver.replay(sv, lid, plan)[0], 'plan does not replay'
 moves = solver.flatten(plan)
 if any(ch not in ARROW for ch in moves):
