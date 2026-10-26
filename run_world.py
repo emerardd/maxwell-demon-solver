@@ -11,7 +11,7 @@ import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mxw, prune, sim, solver
 
-WORLDS = {'w1': '9a498c50', 'w2': '6c1848b0'}
+WORLDS = {'w1': '9a498c50', 'w2': '6c1848b0', 'w3': '214a0e55'}
 KINDS = (('normalSublevels', 'normal'), ('extraSublevels', 'extra'), ('hintSublevels', 'hint'))
 
 

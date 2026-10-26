@@ -1,113 +1,108 @@
-"""A* solver over sim.Model, with entering level blocks.
+"""A* solver over the nested-level world (world.py) and the in-level rules (sim.py).
 
-Enter semantics (w1/w3 texts): entering a level block from direction d sets the inner outside
-temperature to the block's temperature. Exiting (after solving, or by quitting) initialises
-all levels; the demon comes out of the level block continuing in direction d. Assumed here:
-it appears next to the block's *initial* position, destroying a movable block standing there.
+The search state is a whole world.HState: solved levels, the path of entered levels, the
+current level's state and the saved states of the other levels on the path. A level is solved
+when it is added to the solved set, which may happen deep inside the path.
 
-Search works on pushes, Sokoban style, with a heat-aware twist: the demon conducts heat, so
-walking is only folded when it is thermally inert (every conductive neighbour of the cell has
-the same, non-hot temperature and the level is already in heat equilibrium). The cells
+Search works on macro steps, Sokoban style, with a heat-aware twist: the demon conducts heat,
+so walking is only folded when it is thermally inert (every conductive neighbour of the cell
+has the same, non-hot temperature and the level is already in heat equilibrium). The cells
 reachable by inert walking count as one demon position, represented by its smallest cell.
+Macro steps are: a push or heat-changing step (after walking), entering a level block, and
+quitting the current level.
 
-A plan is a list of steps: a string of direction letters 'L'/'D'/'R'/'U', or
-('enter', direction letter, level_id, inner plan or None when quitting).
+A plan is a list of steps: a string of direction letters 'L'/'D'/'R'/'U', ('enter', letter)
+or ('quit',). Exits after solving a level happen by themselves and are not written down.
 """
 from collections import deque
 from itertools import count
 import heapq, time
-import prune, sim
+import prune, sim, world
 
 
 class Solver:
-    """time_budget (seconds) bounds one top-level solve() including nested levels;
-    progress(level_id, states, queued, depth) is called every 20k states if given.
-    h_weight > 1 turns A* into weighted A*: faster, plans no longer guaranteed shortest."""
+    """time_budget (seconds) bounds one solve(); progress(level_id, states, queued, depth) is
+    called every 20k states if given. h_weight > 1 turns A* into weighted A*: faster, plans no
+    longer guaranteed shortest."""
 
     def __init__(self, levels, max_states=2_000_000, weight='cell', time_budget=None, progress=None,
-                 h_weight=1):
-        self.levels, self.max_states, self.weight = levels, max_states, weight
+                 h_weight=1, max_depth=6):
+        self.levels, self.max_states, self.max_depth = levels, max_states, max_depth
         self.time_budget, self.progress, self.h_weight = time_budget, progress, h_weight
-        self.deadline = float('inf')
-        self.models, self.memo = {}, {}
+        self.world = world.World(levels, weight, max_depth)
         self.pruner, self.pruned = prune.Pruner(), 0
 
     def model(self, lid, solved, t_out):
-        key = (lid, solved, t_out)
-        if key not in self.models:
-            self.models[key] = sim.Model(self.levels[lid], solved, t_out, self.weight)
-        return self.models[key]
+        return self.world.model(lid, solved, t_out)
 
-    def solve(self, lid, solved=frozenset(), t_out=sim.NEUTRAL, stack=()):
-        """Return (plan, solved_after) or None."""
-        key = (lid, solved, t_out)
-        if key in self.memo:
-            return self.memo[key]
-        if lid in stack:  # recursion into a level already being solved: not handled in w1
-            return None
-        top = not stack
-        if top and self.time_budget:
-            self.deadline = time.monotonic() + self.time_budget
-        self.memo[key] = None  # guard against cycles through the memo
+    def solve(self, lid, solved=frozenset(), t_out=sim.NEUTRAL):
+        """Return (plan, solved set afterwards) or None if the level cannot be solved.
+
+        Iterative deepening on the path of entered levels: nested and self-referring levels
+        make the state space grow quickly with depth, and most solutions stay shallow."""
+        deadline = time.monotonic() + self.time_budget if self.time_budget else float('inf')
+        depths = sorted({d for d in (2, 3, 4) if d < self.max_depth} | {self.max_depth})
         try:
-            result = self._bfs(lid, solved, t_out, stack + (lid,))
-        except (TimeoutError, RuntimeError):
-            del self.memo[key]  # an aborted search proves nothing
-            raise
+            for depth in depths:
+                self.world.max_depth, self.world.depth_hit = depth, False
+                result = self._search(lid, solved, t_out, deadline)
+                if result is not None or not self.world.depth_hit:
+                    return result  # found, or the limit never cut anything off
+            return None
         finally:
-            if top:
-                self.deadline = float('inf')
-        self.memo[key] = result
-        return result
+            self.world.max_depth = self.max_depth
 
-    def _bfs(self, lid, solved, t_out, stack):
-        m0 = self.model(lid, solved, t_out)
+    def _search(self, lid, solved, t_out, deadline):
+        w = self.world
+        h0 = w.start(lid, solved, t_out)
+        m0 = w.current(h0)
         if not m0.starts:
             return None
-        s0 = m0.initial()
-        if m0.won(s0):
-            return [], solved
-        # A* over macro steps (one push / heat-changing step / level entry each). States are
-        # deduplicated by their canonical key; the actual state reached first is kept so plans
-        # walk from where the demon really stands.
-        # settled[key]: the actual state came out of a heat phase, so it is already in heat
-        # equilibrium (initial and post-exit states are not and must be checked).
-        start = (solved, self._canonical(m0, s0))
-        prev, actual, depth, settled = {start: None}, {start: s0}, {start: 0}, {start: False}
+        if m0.won(h0.top):
+            return [], solved | {lid}
+        # States are deduplicated by their canonical key; the actual state reached first is
+        # kept so plans walk from where the demon really stands. settled[key]: the actual state
+        # came out of a heat phase, so it is in heat equilibrium (start, enter and exit states
+        # are not and must be checked).
+        start = self._key(h0, False)
+        prev, actual, depth, settled = {start: None}, {start: h0}, {start: 0}, {start: False}
         tie = count()
-        h0 = self._h(m0, s0)
-        if h0 == prune.INF:
+        hv = self._h(h0)
+        if hv == prune.INF:
             return None
-        queue = [(self.h_weight * h0, 0, next(tie), start)]
+        queue = [(self.h_weight * hv, 0, next(tie), start)]
         while queue:
-            if time.monotonic() > self.deadline:
+            if time.monotonic() > deadline:
                 raise TimeoutError(f'time budget used up in {lid} after {len(prev)} states')
             _, _, _, node = heapq.heappop(queue)
-            node_solved = node[0]
-            m = self.model(lid, node_solved, t_out)
             g = depth[node] + 1
-            for step, (new_solved, nxt), won, is_settled in self._successors(
-                    lid, m, node_solved, actual[node], t_out, stack, settled[node]):
-                m2 = self.model(lid, new_solved, t_out)
-                key = (new_solved, nxt if won else self._canonical(m2, nxt, is_settled))
-                h = 0 if won else self._h(m2, nxt)
-                if h == prune.INF:
+            for step, nxt, is_settled in self._successors(actual[node], settled[node]):
+                if w.finished(nxt, lid):
+                    prev[('done',)] = (node, step)
+                    return self._plan(prev, ('done',)), nxt.solved
+                hv = self._h(nxt)
+                if hv == prune.INF:
                     self.pruned += 1
                     continue
+                key = self._key(nxt, is_settled)
                 if key not in prev:
                     prev[key], actual[key], depth[key], settled[key] = (node, step), nxt, g, is_settled
-                    if won:
-                        return self._plan(prev, key), new_solved
                     if len(prev) > self.max_states:
                         raise RuntimeError(f'state limit reached in {lid}')
                     if self.progress and len(prev) % 20_000 == 0:
                         self.progress(lid, len(prev), len(queue), g)
-                    heapq.heappush(queue, (g + self.h_weight * h, -g, next(tie), key))
+                    heapq.heappush(queue, (g + self.h_weight * hv, -g, next(tie), key))
         return None
 
-    def _h(self, m, s):
-        """Push-distance lower bound from prune.py; INF marks a dead state."""
-        return self.pruner.h(m, s)
+    def _h(self, h):
+        """Push-distance bound while in the level being solved (INF marks a dead state).
+        Deeper in the path at least one more step is needed, and nothing is pruned."""
+        if len(h.path) == 1:
+            return self.pruner.h(self.world.current(h), h.top)
+        return 1
+
+    def _key(self, h, settled):
+        return h._replace(top=self._canonical(self.world.current(h), h.top, settled))
 
     # -- inert walking ---------------------------------------------------------------------
     @staticmethod
@@ -164,57 +159,36 @@ class Solver:
             path.append(letter)
         return ''.join(reversed(path))
 
-    def _successors(self, lid, m, solved, s, t_out, stack, settled=False):
-        """Yield (step, next node, won, settled) for every push, heat-changing step or entry."""
+    def _successors(self, h, settled=False):
+        """Yield (steps, next HState, settled) for every macro step from h."""
+        w = self.world
+        m, s = w.current(h), h.top
         if s.demon_temp == sim.HOT:
             return
         occ = m.occupancy(s)
         fold = (settled or self._in_equilibrium(m, s)) and self._inert(m, s, occ, s.demon)
         region = self._region(m, s, occ, fold)
+        depth = len(h.path)
         for c in region:
-            here = s._replace(demon=c)
+            here = h._replace(top=s._replace(demon=c))
             walk = self._walk(region, c)
+            lead = [walk] if walk else []
             for d, (dx, dy) in enumerate(sim.DIRS):
-                target = (c[0] + dx, c[1] + dy)
-                if target in region:
+                if (c[0] + dx, c[1] + dy) in region:
                     continue
-                nxt = m.step(here, d)
-                if nxt is not None and not m.lost(nxt):
-                    yield [walk + sim.DIR_NAMES[d]], (solved, nxt), m.won(nxt), True
-                if target not in occ:
-                    continue
-                bi = occ[target][0]
-                inner = m.bodies[bi].level_id
-                if not inner or inner not in self.levels:
-                    continue
-                options = [(None, solved)]
+                nxt = w.step(here, d)
+                if nxt is not None and not (nxt.path and nxt.top.demon_temp == sim.HOT):
+                    same_level = len(nxt.path) == depth and nxt.solved == h.solved
+                    yield [walk + sim.DIR_NAMES[d]], nxt, same_level
                 try:
-                    sub = self.solve(inner, solved, s.temp[bi], stack)
-                except NotImplementedError:
-                    sub = None  # mechanics not modelled yet: the level can still be entered and quit
-                if sub:
-                    options.append((sub[0], sub[1] | {inner}))
-                for inner_plan, new_solved in options:
-                    after = self._exit_state(lid, new_solved, t_out, bi, d)
-                    if after is not None:
-                        steps = [w for w in (walk,) if w] + [('enter', sim.DIR_NAMES[d], inner, inner_plan)]
-                        yield steps, (new_solved, after), False, False
-
-    def _exit_state(self, lid, solved, t_out, bi, d):
-        m = self.model(lid, solved, t_out)
-        p = m.initial_pos[bi]
-        out = (p[0] + sim.DIRS[d][0], p[1] + sim.DIRS[d][1])
-        if not m.inside(out):
-            return None
-        s = m.initial()
-        occ = m.occupancy(s)
-        pos = list(s.pos)
-        if out in occ:
-            bj = occ[out][0]
-            if m.bodies[bj].outside:
-                return None
-            pos[bj] = None  # destroyed by the demon appearing there
-        return sim.State(out, sim.NEUTRAL, tuple(pos), s.temp, s.glue)
+                    nxt, steps = w.enter(here, d), [('enter', sim.DIR_NAMES[d])]
+                except world.Unenterable:
+                    nxt, steps = w.bounce(here, d), [('enter', sim.DIR_NAMES[d]), ('quit',)]
+                if nxt is not None:
+                    yield lead + steps, nxt, False
+        nxt = w.quit(h)
+        if nxt is not None:
+            yield [('quit',)], nxt, False
 
     @staticmethod
     def _plan(prev, node):
@@ -226,42 +200,49 @@ class Solver:
 
 
 def replay(solver, lid, plan, solved=frozenset(), t_out=sim.NEUTRAL):
-    """Re-execute a plan step by step through the rules; return (won, final solved set)."""
-    m = solver.model(lid, solved, t_out)
-    s = m.initial()
-    for step in plan:
+    """Re-execute a plan step by step through the rules; return (solved, final solved set)."""
+    w = solver.world
+    h = w.start(lid, solved, t_out)
+    steps = list(plan)
+    i = 0
+    while i < len(steps):
+        step = steps[i]
+        if not h.path:
+            return False, h.solved  # plan continues after the level was already left
         if isinstance(step, str):
             for letter in step:
-                s = m.step(s, sim.DIR_NAMES.index(letter))
-                if s is None or m.lost(s):
+                h = w.step(h, sim.DIR_NAMES.index(letter))
+                if h is None:
                     return False, solved
-            continue
-        _, dname, inner, inner_plan = step
-        d = sim.DIR_NAMES.index(dname)
-        dx, dy = sim.DIRS[d]
-        occ = m.occupancy(s)
-        c = (s.demon[0] + dx, s.demon[1] + dy)
-        if c not in occ or m.bodies[occ[c][0]].level_id != inner:
+                if not h.path:
+                    break
+                if h.top.demon_temp == sim.HOT:
+                    return False, h.solved
+        elif step[0] == 'enter':
+            d = sim.DIR_NAMES.index(step[1])
+            try:
+                h = w.enter(h, d)
+            except world.Unenterable:
+                if i + 1 >= len(steps) or steps[i + 1] != ('quit',):
+                    return False, solved
+                h = w.bounce(h, d)
+                i += 1
+        elif step[0] == 'quit':
+            h = w.quit(h)
+        if h is None:
             return False, solved
-        bi = occ[c][0]
-        if inner_plan is not None:
-            ok, solved = replay(solver, inner, inner_plan, solved, s.temp[bi])
-            if not ok:
-                return False, solved
-            solved = solved | {inner}
-        m = solver.model(lid, solved, t_out)
-        s = solver._exit_state(lid, solved, t_out, bi, d)
-        if s is None:
-            return False, solved
-    return m.won(s), solved
+        i += 1
+    return w.finished(h, lid), h.solved
 
 
 def flatten(plan):
+    """Plan as one string: letters for moves, [E<dir>] for entering, [Q] for quitting."""
     out = []
     for step in plan:
         if isinstance(step, str):
             out.append(step)
+        elif step[0] == 'enter':
+            out.append(f'[E{step[1]}]')
         else:
-            _, d, inner, inner_plan = step
-            out.append(f'E{d}[{inner}:{flatten(inner_plan) if inner_plan else "quit"}]')
+            out.append('[Q]')
     return ''.join(out)

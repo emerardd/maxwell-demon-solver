@@ -70,7 +70,11 @@ class Model:
             raise NotImplementedError(f'retentive temperature in {level.id}')
         self.starts = starts
 
-        # Rigid bodies: cells joined through a pair of MERGED faces. Level blocks stay single.
+        # Bodies: cells joined through pairs of sticky faces form a piece. A piece holding a
+        # fixed cell (walls are a mix of pinned and unpinned cells) can never move or come
+        # apart, so it is one body. A movable piece is split into one body per cell, joined
+        # through the glue grouping instead, so that a single block of it can be destroyed
+        # (w3/transition-2). Level blocks stay single.
         parent = {c: c for c in blocks}
 
         def find(c):
@@ -86,9 +90,16 @@ class Model:
                 nb = blocks.get(n)
                 if nb and n not in level_of and b.side(i) == MERGED and nb.side(OPP[i]) == MERGED:
                     parent[find(n)] = find((x, y))
-        groups = {}
+        pieces = {}
         for c in sorted(blocks, key=lambda c: (c[1], c[0])):
-            groups.setdefault(find(c), []).append(c)
+            pieces.setdefault(find(c), []).append(c)
+        groups = {}
+        for cells in pieces.values():
+            if any(blocks[c].fixed for c in cells):
+                groups[cells[0]] = cells
+            else:
+                groups.update({c: [c] for c in cells})
+        groups = dict(sorted(groups.items(), key=lambda kv: (kv[0][1], kv[0][0])))
 
         self.bodies, pos, temp = [], [], []
         for cells in groups.values():
@@ -154,6 +165,11 @@ class Model:
                 self._members_cache.clear()
             self._members_cache[glue] = g
         return g
+
+    def destroy(self, s, bi):
+        """Remove body bi (w3/transition-2); its former group splits where it is now broken."""
+        pos = tuple(None if j == bi else p for j, p in enumerate(s.pos))
+        return s._replace(pos=pos, glue=self._glue(pos, tuple(range(len(pos)))))
 
     def stuck(self, s, bi):
         """Is body bi glued into a group that can never move?"""

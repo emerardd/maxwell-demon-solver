@@ -6,25 +6,32 @@ Levels are drawn in a small ASCII language:
     o  neutral block   h  hot block   c  cold block      (conductive on all sides)
     O  insulated neutral block   x  fixed neutral block
     t  transparent block
+    A..Z  level block, linked to a level id through `links`
 Set MXW_GAME_DIR to also run the data tests against the installed game.
 """
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import mxw, prune, sim, solver
+import mxw, prune, sim, solver, world
 from sim import HOT, COLD, NEUTRAL
 
 L, D, R, U = range(4)
 ATTR = {'o': 2, 'h': 6, 'c': 10, 'O': 2, 'x': 3, 't': 0, '#': 3, 'w': 3}
+UNSOLVED, SOLVED = mxw.Block(3, 0xaa), mxw.Block(2, 0x55)  # fixed + insulated, then movable
 
 
-def build(rows, faces=None):
-    """faces: {(x, y): (left, down, right, up)} overrides for single blocks."""
+def build(rows, faces=None, links=None, lid='test'):
+    """faces: {(x, y): (left, down, right, up)} overrides for single blocks.
+    links: {letter: level id, or (level id, unsolved Block, solved Block)}."""
     h, w = len(rows), len(rows[0])
     grid, goals = [], []
     for y, row in enumerate(rows):
         line = []
         for x, ch in enumerate(row):
-            if ch in '.*':
+            if links and ch in links:
+                spec = links[ch]
+                target, unsolved, solved = (spec, UNSOLVED, SOLVED) if isinstance(spec, str) else spec
+                line.append(mxw.LevelBlock(1, target, unsolved, solved))
+            elif ch in '.*':
                 line.append(None)
                 if ch == '*':
                     goals.append((x, y))
@@ -42,7 +49,7 @@ def build(rows, faces=None):
                     codes = list(faces[(x, y)])
                 line.append(mxw.Block(ATTR[ch], sum(c << (2 * i) for i, c in enumerate(codes))))
         grid.append(line)
-    return mxw.Level('test', w, h, grid, goals)
+    return mxw.Level(lid, w, h, grid, goals)
 
 
 def run(rows, moves, t_out=NEUTRAL, faces=None):
@@ -57,6 +64,22 @@ def run(rows, moves, t_out=NEUTRAL, faces=None):
 
 def temp_at(m, s, cell):
     return s.temp[m.occupancy(s)[cell][0]]
+
+
+class Walls(unittest.TestCase):
+    def test_unpinned_wall_cells_belong_to_the_outside(self):
+        # in the game files walls alternate pinned (attr 3) and unpinned (attr 2) cells
+        level = build(['#####',
+                       '#@.*#',
+                       '#####'])
+        for y, row in enumerate(level.grid):
+            for x, o in enumerate(row):
+                if isinstance(o, mxw.Block) and (x + y) % 2:
+                    row[x] = mxw.Block(2, o.sides)
+        m = sim.Model(level)
+        walls = [b for b in m.bodies if b.outside]
+        self.assertEqual(len(walls), 1)
+        self.assertEqual(len(m.bodies), 1)
 
 
 class Pushing(unittest.TestCase):
@@ -95,7 +118,7 @@ class Pushing(unittest.TestCase):
         faces = {(3, 1): (1, 0, 1, 1), (3, 2): (1, 1, 1, 0)}  # merged vertically
         m, s = run(rows, [R, R], faces=faces)
         occ = m.occupancy(s)
-        self.assertEqual(occ[(4, 1)][0], occ[(4, 2)][0])
+        self.assertEqual(s.glue[occ[(4, 1)][0]], s.glue[occ[(4, 2)][0]])
 
     def test_blocked_multi_cell_body(self):
         rows = ['#######',
@@ -276,6 +299,160 @@ class Goal(unittest.TestCase):  # w1/level
         self.assertFalse(m.won(s))
 
 
+class Transitions(unittest.TestCase):  # w3 texts
+    EMPTY = ['#####',
+             '#@..#',
+             '#####']
+
+    def make(self, **levels):
+        """levels: id -> (rows, links); returns a World."""
+        return world.World({lid: build(rows, links=links, lid=lid) for lid, (rows, links) in levels.items()})
+
+    def walk(self, w, h, *moves):
+        for d in moves:
+            h = w.step(h, d)
+            self.assertIsNotNone(h)
+        return h
+
+    def body_at(self, w, h, cell):
+        hit = w.current(h).occupancy(h.top).get(cell)
+        return hit and hit[0]
+
+    def test_quit_comes_out_past_the_block_and_resets_everything(self):  # exit-1, exit-2
+        w = self.make(P=(['#######',
+                          '#@.A..#',
+                          '#.o...#',
+                          '#######'], {'A': 'A'}),
+                      A=(self.EMPTY, None))
+        h = self.walk(w, w.start('P'), D, R, U)        # push o to (3,2), stand left of A
+        h = w.enter(h, R)
+        self.assertEqual([f.lid for f in h.path], ['P', 'A'])
+        self.assertEqual(h.top.demon, (1, 1))         # inner start
+        h = w.quit(h)
+        self.assertEqual(h.top.demon, (4, 1))         # block (3,1) + entry direction
+        self.assertIsNotNone(self.body_at(w, h, (2, 2)))  # o is back where it started
+
+    def test_exit_direction_is_entry_direction(self):  # exit-2
+        w = self.make(P=(['#######',
+                          '#...A@#',
+                          '#######'], {'A': 'A'}),
+                      A=(self.EMPTY, None))
+        h = w.quit(w.enter(w.start('P'), L))
+        self.assertEqual(h.top.demon, (3, 1))
+
+    def test_outside_temperature_follows_the_block_then_neutral(self):  # transition-3
+        hot_block = ('A', mxw.Block(7, 0xaa), SOLVED)  # fixed, hot, insulated
+        w = self.make(P=(['######',
+                          '#@A..#',
+                          '######'], {'A': hot_block}),
+                      A=(['#w###',
+                          '#.@.#',
+                          '#####'], None))
+        h = w.enter(w.start('P', t_out=HOT), R)
+        self.assertEqual(h.path[-1].t_out, HOT)
+        self.assertFalse(h.top.demon_temp == HOT)     # transition-1: no heat on arrival
+        self.assertEqual(w.step(h, L).top.demon_temp, HOT)  # under the window to a hot outside
+        h = w.quit(h)
+        self.assertEqual(h.path[-1].t_out, NEUTRAL)   # the level you are now in: neutral
+
+    def test_block_where_the_demon_comes_out_is_destroyed(self):  # transition-2
+        w = self.make(P=(['######',
+                          '#@Ao.#',
+                          '######'], {'A': 'A'}),
+                      A=(self.EMPTY, None))
+        h = w.quit(w.enter(w.start('P'), R))
+        self.assertEqual(h.top.demon, (3, 1))
+        self.assertEqual(sum(p is not None for p in h.top.pos), sum(
+            p is not None for p in w.current(h).initial_pos) - 1)
+
+    def test_no_heat_when_coming_out_next_to_a_hot_block(self):  # transition-1
+        w = self.make(P=(['######',
+                          '#@A.h#',
+                          '######'], {'A': 'A'}),
+                      A=(self.EMPTY, None))
+        h = w.quit(w.enter(w.start('P'), R))
+        self.assertEqual(h.top.demon, (3, 1))
+        self.assertEqual(h.top.demon_temp, NEUTRAL)
+
+    def test_entering_the_current_level_keeps_its_state(self):  # enter-2
+        w = self.make(Q=(['####',
+                          '#@P#',
+                          '#..#',
+                          '####'], {'P': 'P'}),
+                      P=(['#######',
+                          '#@o...#',
+                          '#.....#',
+                          '#...S.#',
+                          '#######'], {'S': 'P'}))
+        h = w.enter(w.start('Q'), R)                   # into P moving right
+        h = self.walk(w, h, R, D, R, R)               # o pushed to (3,1), demon above S
+        h = w.enter(h, D)                              # P again, moving down
+        self.assertEqual([f.lid for f in h.path], ['Q', 'P'])  # the path does not grow
+        self.assertEqual(h.top.demon, (1, 1))
+        self.assertIsNotNone(self.body_at(w, h, (3, 1)))  # o stayed where it was pushed
+        h = w.quit(h)
+        self.assertEqual([f.lid for f in h.path], ['Q'])
+        self.assertEqual(h.top.demon, (2, 2))         # Q's block (2,1), last entry direction: down
+
+    def test_path_depth_is_bounded(self):  # A -> B -> A -> ... stays finite
+        w = self.make(A=(['#####',
+                          '#@B.#',
+                          '#####'], {'B': 'B'}),
+                      B=(['#####',
+                          '#@A.#',
+                          '#####'], {'A': 'A'}))
+        h, depth = w.start('A'), 1
+        while (nxt := w.enter(h, R)) is not None:
+            h, depth = nxt, depth + 1
+        self.assertEqual(depth, w.max_depth)
+
+    def test_level_left_for_another_keeps_its_state(self):  # enter-3
+        w = self.make(A=(['#######',
+                          '#@o...#',
+                          '#...B.#',
+                          '#######'], {'B': 'B'}),
+                      B=(['#####',
+                          '#@A.#',
+                          '#####'], {'A': 'A'}))
+        h = self.walk(w, w.start('A'), R, D, R)
+        h = w.enter(w.enter(h, R), R)                  # A -> B -> A
+        self.assertEqual([f.lid for f in h.path], ['A', 'B', 'A'])
+        self.assertIsNotNone(self.body_at(w, h, (3, 1)))  # A as it was left
+        self.assertEqual(h.top.demon, (1, 1))
+
+    def test_solving_exits_and_changes_the_level_block(self):  # w1/level, goal
+        w = self.make(P=(['#######',
+                          '#.....#',
+                          '#@.A.*#',
+                          '#.....#',
+                          '#######'], {'A': 'A'}),
+                      A=(['######',
+                          '#@o*.#',
+                          '######'], None))
+        h = self.walk(w, w.start('P'), R)
+        h = w.enter(h, R)
+        h = w.step(h, R)                               # solves A: automatic exit
+        self.assertEqual([f.lid for f in h.path], ['P'])
+        self.assertIn('A', h.solved)
+        self.assertEqual(h.top.demon, (4, 2))
+        self.assertFalse(w.current(h).bodies[self.body_at(w, h, (3, 2))].fixed)
+
+    def test_solver_uses_a_solved_level_block(self):
+        levels = {'P': build(['#######',
+                              '#.....#',
+                              '#@.A.*#',
+                              '#.....#',
+                              '#######'], links={'A': 'A'}, lid='P'),
+                  'A': build(['######',
+                              '#@o*.#',
+                              '######'], lid='A')}
+        sv = solver.Solver(levels)
+        plan, solved = sv.solve('P')
+        self.assertEqual(solved, {'A', 'P'})
+        self.assertTrue(solver.replay(sv, 'P', plan)[0])
+        self.assertIn('[ER]', solver.flatten(plan))
+
+
 S, P, I = sim.STICKY, sim.PLAIN, sim.INSULATED
 
 
@@ -343,13 +520,27 @@ class Sticky(unittest.TestCase):  # w2/sticky-1..3
         self.assertEqual(s.glue[occ[(3, 1)][0]], s.glue[occ[(4, 1)][0]])
         self.assertEqual(temp_at(m, s, (3, 1)), NEUTRAL)
 
-    def test_sticky_faces_pre_joined_in_file_are_one_body(self):
+    def test_sticky_faces_pre_joined_in_file_are_glued_from_the_start(self):
         faces = {(3, 1): (P, P, S, P), (4, 1): (S, P, P, P)}
         m = sim.Model(build(['#######',
                              '#.@oo.#',
                              '#######'], faces))
-        occ = m.occupancy(m.initial())
-        self.assertEqual(occ[(3, 1)][0], occ[(4, 1)][0])
+        s = m.initial()
+        occ = m.occupancy(s)
+        self.assertNotEqual(occ[(3, 1)][0], occ[(4, 1)][0])  # two blocks ...
+        self.assertEqual(s.glue[occ[(3, 1)][0]], s.glue[occ[(4, 1)][0]])  # ... one rigid group
+
+    def test_destroying_one_block_of_a_glued_pair_frees_the_other(self):  # w3/transition-2
+        faces = {(3, 1): (P, P, S, P), (4, 1): (S, P, P, P)}
+        m = sim.Model(build(['########',
+                             '#.@oo..#',
+                             '########'], faces))
+        s = m.initial()
+        s = m.destroy(s, m.occupancy(s)[(3, 1)][0])
+        self.assertNotIn((3, 1), m.occupancy(s))
+        s = m.step(m.step(s, R), R)                   # walk up to the survivor and push it
+        self.assertIn((5, 1), m.occupancy(s))
+        self.assertNotIn((4, 1), m.occupancy(s))
 
 
 class Transparent(unittest.TestCase):  # w2/empty-1, empty-2
@@ -442,21 +633,33 @@ class GameData(unittest.TestCase):
         self.assertLessEqual(set(self.errors), {'16fa52fc', '5aa8419e', '7960b275', '88abb570'})
 
     # Tutorial levels the current search cannot finish quickly; checked only by run_world.py.
-    KNOWN_SLOW = {'eadb3d02'}  # w1/insulated-2
+    KNOWN_SLOW = {'eadb3d02',             # w1/insulated-2
+                  '44efd75a', '0d33f295',  # w3/transition-3, w3/path: deep nesting (~90 s)
+                  '1bfecdfb'}             # w3/enter-3: unsolvable unless unpinned wall cells can
+                                          # be destroyed by the demon appearing on them (open)
+    # Tutorial levels only solvable in the context they are met in: (solved levels, outside).
+    CONTEXT = {'8d2fdcfc': (frozenset({'394c69e4'}), COLD)}  # entered through a cold block
 
     def test_tutorial_levels_solve_and_replay(self):
         import run_world
         sv = solver.Solver(self.levels, time_budget=30)
-        for world in ('w1', 'w2'):
+        for world in ('w1', 'w2', 'w3'):
             for kind, lid in run_world.world_levels(self.structure, self.levels, world):
                 if kind != 'hint' or not any(t[2].startswith(world + '/') for t in self.levels[lid].texts):
                     continue
                 if lid in self.KNOWN_SLOW:
                     continue
+                solved, t_out = self.CONTEXT.get(lid, (frozenset(), NEUTRAL))
                 with self.subTest(level=lid):
-                    r = sv.solve(lid)
+                    r = sv.solve(lid, solved, t_out)
                     self.assertIsNotNone(r)
-                    self.assertTrue(solver.replay(sv, lid, r[0])[0])
+                    self.assertTrue(solver.replay(sv, lid, r[0], solved, t_out)[0])
+
+    def test_context_levels_need_their_context(self):
+        sv = solver.Solver(self.levels, time_budget=30)
+        for lid in self.CONTEXT:
+            with self.subTest(level=lid):
+                self.assertIsNone(sv.solve(lid))  # on its own, with a neutral outside: no way
 
 
 if __name__ == '__main__':
