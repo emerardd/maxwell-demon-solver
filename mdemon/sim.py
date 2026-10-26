@@ -542,8 +542,9 @@ class Model:
         """The move phase of piston P acting (hot contracted: extends; cold extended:
         contracts). The new state before heat transfer, or None when it is blocked.
         Extending pushes the content out, or else moves the piston back off it; contracting
-        pulls a block stuck to the movable side in, or else moves the piston over it. Only
-        when neither works without pushing the demon is the demon pushed away (seen in the
+        pulls a block stuck to the movable side in, and is blocked if that block cannot come
+        (w4/piston-active-3: the piston does not move over it, unlike when pushed). Only
+        when nothing works without pushing the demon is the demon pushed away (seen in the
         game: w4-2 moves the piston back rather than the demon, 1ef673fc and w4-2's first
         press push the demon, the piston being stuck)."""
         k, front = self.pindex[P], self.pdir[P]
@@ -566,8 +567,7 @@ class Model:
                 return None
             else:
                 r = next(filter(None, (
-                    self._move(s, OPP[front], [a], held=(P,), demon=how) or
-                    self._move(s, front, [P], held=(a,), demon=how, envelop=(P, a))
+                    self._move(s, OPP[front], [a], held=(P,), demon=how)
                     for how in ('block', 'push'))), None)
         if r is None:
             return None
