@@ -759,6 +759,14 @@ class GameData(unittest.TestCase):
                     sv, plan, _ = r
                     self.assertTrue(solver.replay(sv, lid, plan, **ctx)[0])
 
+    def test_derived_layout_solves_w1_15(self):
+        # the shuffle level: cooling layout and stage order derived backwards from the goal
+        import derive
+        d = derive.Derivation(self.levels, '4b1153be', 30, log=lambda *a: None)
+        plan = d.solve()
+        self.assertIsNotNone(plan)
+        self.assertTrue(solver.replay(d.staged.sv, '4b1153be', plan)[0])
+
     def test_context_levels_need_their_context(self):
         sv = solver.Solver(self.levels, time_budget=30)
         for lid in self.CONTEXT:
