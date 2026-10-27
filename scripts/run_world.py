@@ -9,7 +9,7 @@ NOBLOCKS = the level holds nothing that could stand on its goal (not a puzzle on
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import mxw, prune, sim, solver
+from mdemon import mxw, prune, sim, solver, store
 from mdemon.catalog import world_levels
 
 
@@ -42,6 +42,8 @@ if __name__ == '__main__':
             try:
                 r = sv.solve(lid)
                 status = ok_tag if r and solver.replay(sv, lid, r[0])[0] else ('BADPLAN' if r else 'UNSOLVABLE')
+                if status == ok_tag:
+                    store.record(lid, r[0], source='run_world')
                 msg = f'{len(solver.flatten(r[0]))} chars  {solver.flatten(r[0])[:90]}' if r else ''
                 break
             except TimeoutError as e:

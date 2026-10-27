@@ -13,7 +13,7 @@ Set MXW_GAME_DIR to also run the data tests against the installed game.
 """
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import mxw, prune, sim, solver, world
+from mdemon import mxw, prune, sim, solver, store, world
 from mdemon.sim import HOT, COLD, NEUTRAL
 
 L, D, R, U = range(4)
@@ -777,6 +777,33 @@ class Pistons(unittest.TestCase):  # w4/piston-*, rules checked in the game
         s = m.step(m.initial(), R)
         self.assertEqual([e for e, _ in s.pist], [True, True])
         self.assertEqual(m.by_priority, [m.occupancy(s)[(5, 1)][0], m.occupancy(s)[(3, 1)][0]])
+
+
+class Store(unittest.TestCase):  # solutions/db.json, here on a temporary file
+    def setUp(self):
+        import tempfile
+        self.dir = tempfile.TemporaryDirectory()
+        self.path = os.path.join(self.dir.name, 'db.json')
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def test_plan_text_round_trip(self):
+        plan = ['RRU', ('enter', 'L'), 'D', ('quit',), 'LL']
+        text = solver.flatten(plan)
+        self.assertEqual(store.unflatten(text), plan)
+        self.assertEqual(store.moves(text), 8)
+
+    def test_shortest_plan_is_best_and_verification_stays_with_its_plan(self):
+        self.assertTrue(store.record('x', 'RRRR', source='a', path=self.path))
+        store.verify('x', path=self.path)
+        self.assertFalse(store.record('x', 'RRRRRR', source='b', path=self.path))
+        self.assertTrue(store.record('x', 'RR', source='c', path=self.path))
+        entry = store.load(self.path)['x']
+        self.assertEqual(store.best(entry)[0], 'RR')
+        self.assertEqual(list(entry['verified']), ['RRRR'])
+        store.record('x', 'RR', source='d', path=self.path)  # found again: one plan, two sources
+        self.assertEqual(store.load(self.path)['x']['plans']['RR']['sources'], ['c', 'd'])
 
 
 class SubGoals(unittest.TestCase):

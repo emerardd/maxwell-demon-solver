@@ -4,7 +4,7 @@ LEVEL@SCOPE starts the search in SCOPE (an ancestor) and stops once LEVEL is sol
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import mxw, solver
+from mdemon import mxw, solver, store
 
 levels = mxw.load_world(sys.argv[1])[0]
 sv = solver.Solver(levels, time_budget=float(sys.argv[2]))
@@ -17,6 +17,8 @@ for arg in sys.argv[3:]:
             print(f'{arg}: UNSOLVABLE ({time.time() - t:.1f}s)', flush=True)
         else:
             ok = solver.replay(sv, lid, r[0], scope=scope or None)[0]
+            if ok:
+                store.record(lid, r[0], store.ctx_of(scope=scope), 'solve_one')
             print(f'{arg}: {"OK" if ok else "BADPLAN"} ({time.time() - t:.1f}s) {solver.flatten(r[0])}', flush=True)
     except TimeoutError:
         print(f'{arg}: TIMEOUT ({time.time() - t:.1f}s)', flush=True)

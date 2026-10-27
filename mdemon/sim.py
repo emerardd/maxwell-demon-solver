@@ -187,6 +187,7 @@ class Model:
                 if (cx + DIRS[i][0], cy + DIRS[i][1]) not in own))
         self._members_cache, self._occ_cache, self._link_cache = {}, {}, {}
         self._contact_cache, self._touch_cache = {}, {}
+        self.last_extra = 0  # extra steps of the last turn played with step()
         self.initial_glue = self._glue(self.initial_pos, tuple(range(len(self.bodies))),
                                        pist=self.initial_pist)
         # Per body, its non-insulated faces that point out of the body and into the grid, as
@@ -621,8 +622,10 @@ class Model:
 
     def _turn(self, s):
         """Heat phase, then extra steps while a triggered piston can act. None when the turn
-        does not settle within MAX_STEPS steps."""
-        for _ in range(MAX_STEPS):
+        does not settle within MAX_STEPS steps. The number of extra steps is left in
+        self.last_extra (the TAS export waits for each)."""
+        for extra in range(MAX_STEPS):
+            self.last_extra = extra
             s = self.heat(s)
             for P in self.triggered(s):
                 nxt = self._actuate(s, P)
@@ -684,6 +687,7 @@ class Model:
         if not self.inside(target):
             return None
         occ = self.occupancy(s)
+        self.last_extra = 0
         if self.pistons:
             if target in occ:
                 seed = occ[target][0]

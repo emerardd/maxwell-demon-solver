@@ -1,0 +1,102 @@
+{
+ "1405c8dd": {
+  "plans": {
+   "LLLDRRRDDRRUDLLUUURURRDLULLDDDDRRUUDDLLURRLLUUURDLDRUURDDLDDRRLLUURDLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 71,
+    "sources": [
+     "import w4-4_1405c8dd.txt"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "1e9b113b": {
+  "plans": {
+   "DRDDRRDDRURULLLLDLLURDRUUULUURDLDRDDRRRRRRURULDDLLULLDLLUURRUURRDDDRRRDLLLLLLRUULLDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 84,
+    "sources": [
+     "import w1-12_1e9b113b.txt"
+    ]
+   }
+  },
+  "verified": {
+   "DRDDRRDDRURULLLLDLLURDRUUULUURDLDRDDRRRRRRURULDDLLULLDLLUURRUURRDDDRRRDLLLLLLRUULLDD": "2026-10-27"
+  }
+ },
+ "1ef673fc": {
+  "plans": {
+   "DRRRUUURRDRLULLDDDLLLLDRDRULURRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 32,
+    "sources": [
+     "solve_one"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "4b1153be": {
+  "plans": {
+   "DRRRRULLDLUUDRRRUULLLDLLURRRRRRLLLLDRRRDRULLLLLLDRRRRDRULURDRRRRRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 66,
+    "sources": [
+     "import w1-15_4b1153be.txt",
+     "import w1-15_4b1153be_auto.txt"
+    ]
+   }
+  },
+  "verified": {
+   "DRRRRULLDLUUDRRRUULLLDLLURRRRRRLLLLDRRRDRULLLLLLDRRRRDRULURDRRRRRU": "2026-10-27"
+  }
+ },
+ "93c8cbea": {
+  "plans": {
+   "RURRDLLULDLDRRRRRRURDLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 24,
+    "sources": [
+     "solve_one"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c27d4c92": {
+  "plans": {
+   "LDDRURRRULUURRDLLULDLDDRLURRRDRRRRRUUULDLLDULDRURRRDLLLULLLLLDDDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 65,
+    "sources": [
+     "import w4-16_c27d4c92.txt"
+    ]
+   }
+  },
+  "verified": {
+   "LDDRURRRULUURRDLLULDLDDRLURRRDRRRRRUUULDLLDULDRURRRDLLLULLLLLDDDR": "2026-10-27"
+  }
+ },
+ "eadb3d02": {
+  "plans": {
+   "RRRRRRRRRUURRRDRLUURDRRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 24,
+    "sources": [
+     "import w1-hint_eadb3d02.txt"
+    ]
+   }
+  },
+  "verified": {
+   "RRRRRRRRRUURRRDRLUURDRRU": "2026-10-27"
+  }
+ }
+}

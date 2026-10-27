@@ -5,7 +5,7 @@ Quick check after a rule change; the full batch is catalog.py.
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import catalog, mxw, sim, solver
+from mdemon import catalog, mxw, sim, solver, store
 
 levels, structure, _ = mxw.load_world(sys.argv[1])
 world = sys.argv[2]
@@ -24,6 +24,8 @@ for n, lid in enumerate(todo, 1):
             r = sv.solve(lid, t_out=t_out)
             status = 'OK' if r and solver.replay(sv, lid, r[0], t_out=t_out)[0] else ('BADPLAN' if r else 'UNSOLVABLE')
             msg = solver.flatten(r[0])[:80] if r else ''
+            if status == 'OK':
+                store.record(lid, r[0], store.ctx_of(t_out=t_out), 'run_tutorials')
         except TimeoutError:
             status, msg = 'TIMEOUT', ''
         except (RuntimeError, NotImplementedError) as e:

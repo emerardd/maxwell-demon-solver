@@ -6,7 +6,7 @@ map after it, so a mismatch in the game can be found quickly.
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import mxw, sim, solver
+from mdemon import mxw, sim, solver, store
 from mdemon.report import walkthrough
 
 if __name__ == '__main__':
@@ -15,4 +15,5 @@ if __name__ == '__main__':
     budget = float(sys.argv[3]) if len(sys.argv) > 3 else 60
     sv, plan, _ = solver.solve_any(levels, lid, budget)
     assert solver.replay(sv, lid, plan)[0], 'plan does not replay'
+    store.record(lid, plan, source='show_solution')
     walkthrough(sv, lid, plan)

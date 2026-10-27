@@ -6,7 +6,7 @@ it was solved, the time, the states expanded and the plan length (moves, entries
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import mxw, solver
+from mdemon import mxw, solver, store
 
 CONFIGS = [('A admissible greedy', 'admissible', 50),
            ('B informed  w=3   ', 'informed', 3),
@@ -33,6 +33,8 @@ for arg in args[2:]:
             else:
                 ok = solver.replay(sv, lid, r[0], scope=scope or None)[0]
                 status, length = ('OK' if ok else 'BADPLAN'), f'{len(solver.flatten(r[0]))} chars'
+                if ok:
+                    store.record(lid, r[0], store.ctx_of(scope=scope), 'bench ' + name.split()[0])
         except TimeoutError:
             status, length, states = 'TIMEOUT', '', len(sv.last_search[0])
         print(f'{lid} {name}: {status:10} {time.time() - t:5.1f}s {states:8,} states  {length}', flush=True)

@@ -36,6 +36,9 @@ python -m unittest discover -s tests
 
 | 用途 | 命令 |
 |---|---|
+| 解法库：每关最优解和游戏内验证情况 | `python scripts/solutions.py list [w4]` |
+| 在游戏里通过后标记 | `python scripts/solutions.py verify w4-16` |
+| 导出 TAS 脚本（见下） | `python scripts/solutions.py tas w4-16` |
 | 查某个内部 id 在游戏里的位置和地图 | `python scripts/where_is.py <游戏目录> <id>` |
 | 生成一关的分步攻略 | `python scripts/show_solution.py <游戏目录> <id> [秒数]` |
 | 求解单关（可指定上一级作为范围） | `python scripts/solve_one.py <游戏目录> <秒数> <id>[@上一级id] ...` |
@@ -51,6 +54,12 @@ python -m unittest discover -s tests
 | 某关真关卡块周围 / 恶魔能走到哪 | `scripts/near_block.py`，`scripts/map_reach.py` |
 
 批量求解很耗时，在后台跑并把日志写进 `logs/`。
+
+## 解法库和 TAS
+
+`solve_one.py`、`run_world.py`、`run_tutorials.py`、`run_extras.py`、`show_solution.py`、`bench.py` 解出并回放成功的解法，都会自动存进 `solutions/db.json`（`mdemon/store.py`）。同一关的所有不同解法都会保留下来，步数最少的就是最优解。在游戏里照着走通以后，用 `solutions.py verify` 标记，标记跟着那一条具体的解法走；以后找到更短的解时，列表会显示"旧解已通过，最优解未验证"。
+
+`solutions.py tas` 把最优解导出成 [WYXkk/Maxwell-s-TAS-demon](https://github.com/WYXkk/Maxwell-s-TAS-demon) 的脚本，放在 `solutions/tas/`。它会在规则模拟里回放一遍，每次有活塞额外动作就补一个 `p`，过关后补 `-`。脚本从关卡起点开始，所以要先手动进入关卡。用法：用 C++ 编译器编译那个项目的 `tas.cpp`，旁边放一个写着各按键等待时间的 `interval.txt`（格式见它的 README），运行后输入脚本路径，3 秒内切回游戏窗口；按住 `t` 可以中途停止。含进入关卡的解法里，`e` 的朝向还没核对过。
 
 ## GitHub 上的相关项目（2026-10 查询）
 

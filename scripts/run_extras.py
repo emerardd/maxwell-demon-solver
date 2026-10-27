@@ -6,7 +6,7 @@ Per level: solve_any (guided search, then shortest-plan A*); if that gives nothi
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import catalog, derive, mxw, solver
+from mdemon import catalog, derive, mxw, solver, store
 
 game = sys.argv[1]
 budget = float(sys.argv[2]) if len(sys.argv) > 2 else 60
@@ -32,6 +32,8 @@ for n, (world, letter, lid) in enumerate(todo, 1):
             sv, plan, _ = r
             ok = solver.replay(sv, lid, plan)[0]
             status = 'OK' if ok else 'BADPLAN'
+            if ok:
+                store.record(lid, plan, source='run_extras')
             msg = f'{len(solver.flatten(plan))} chars'
     except TimeoutError:
         status = 'TIMEOUT'
@@ -44,6 +46,7 @@ for n, (world, letter, lid) in enumerate(todo, 1):
             plan = d.solve()
             if plan is not None and solver.replay(d.staged.sv, lid, plan)[0]:
                 status, msg = 'OK(derive)', f'{len(solver.flatten(plan))} chars'
+                store.record(lid, plan, source='derive')
         except NotImplementedError as e:
             msg = str(e)
     results.append((world, letter, lid, status, time.time() - t, msg))

@@ -1,0 +1,4 @@
+# w4-16 (c27d4c92), 65 moves, for WYXkk/Maxwell-s-TAS-demon
+# start inside the level, at its start (enter it by hand first)
+assdpwdddwawwddsaawasassdawdddsdddddwwwa
+saaswasdwdddsaaawaaaaasssd-

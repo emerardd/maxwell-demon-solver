@@ -48,6 +48,23 @@ def world_levels(structure, levels, world, with_unreachable=False):
     return out
 
 
+def labels(structure):
+    """{level id: name in the game} for the worlds in WORLDS: 'w4-3', 'w4-C', 'w4-3 提示'
+    (its hint level, H), 'w4 教程 2' (second level on the world's hint map)."""
+    out = {}
+    for world in WORLDS:
+        node = find(structure['root'], WORLDS[world])
+        out.update(numbered(structure, world))
+        for k in ('normalSublevels', 'extraSublevels'):
+            for ch in node.get(k, []):
+                for h in ch.get('hintSublevels', []):
+                    out.setdefault(h['id'], out[ch['id']] + ' 提示')
+        for hub in node.get('hintSublevels', []):
+            for i, ch in enumerate(hub.get('hintSublevels', []), 1):
+                out.setdefault(ch['id'], f'{world} 教程 {i}')
+    return out
+
+
 def numbered(structure, world):
     """{level id: label} for a world's numbered and lettered levels, e.g. 'w1-15', 'w1-C'."""
     node = find(structure['root'], WORLDS.get(world, world))
