@@ -16,6 +16,10 @@ cells, a lower bound for any shape. When a movable body has a sticky face pointi
 initial group, new shapes can be pushed from any member, so the group tables drop the "demon
 needs a free cell behind" condition too.
 
+In piston levels a piston can push a block where the demon could not stand, and move it several
+cells in one turn, so the tables are relaxed and the bound is no longer admissible; walls still
+stop pistons, so a goal no block can reach still marks a dead state.
+
 Levels holding a level block get the bound capped at one step: entering it can reset the level,
 re-entering this level can move the demon to its start, and solving it can change the block.
 """
@@ -88,7 +92,8 @@ def distances(m, cells, opaque, static, relaxed):
 class Tables:
     def __init__(self, m):
         static = static_cells(m)
-        relaxed = has_movable_sticky(m)
+        # pistons push blocks without the demon behind them (and carry, pull and drag them)
+        relaxed = has_movable_sticky(m) or bool(m.pistons)
         self.group = {}   # rep -> (members, table over the rep's origin)
         for rep, (members, immovable) in m.groups(m.initial_glue).items():
             if immovable:

@@ -121,8 +121,6 @@ class Solver:
         Anywhere else at least one more step is needed, and nothing is pruned."""
         if len(h.path) == 1 and h.path[0].lid == self.target:
             m = self.world.current(h)
-            if m.pistons:
-                return 1  # the push tables know nothing of blocks moved by pistons
             if self.heuristic == 'informed':
                 return self.pruner.informed(m, h.top)
             return self.pruner.h(m, h.top)

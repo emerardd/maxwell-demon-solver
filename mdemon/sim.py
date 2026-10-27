@@ -186,6 +186,7 @@ class Model:
                 (cx, cy, i) for cx, cy in b.cells for i in range(4)
                 if (cx + DIRS[i][0], cy + DIRS[i][1]) not in own))
         self._members_cache, self._occ_cache, self._link_cache = {}, {}, {}
+        self._contact_cache, self._touch_cache = {}, {}
         self.initial_glue = self._glue(self.initial_pos, tuple(range(len(self.bodies))),
                                        pist=self.initial_pist)
         # Per body, its non-insulated faces that point out of the body and into the grid, as
@@ -350,7 +351,18 @@ class Model:
     def _contacts(self, pos, holes, pist):
         """Touching faces in a piston level, as (a, face of a, b, face of b, kind). kind 'n':
         ordinary, reported from both sides; 'm': b touches the movable side of piston a; 'w':
-        content b touches an inner wall of its piston a (insulated, but sticky faces hold)."""
+        content b touches an inner wall of its piston a (insulated, but sticky faces hold).
+        Cached per position, holes and pistons."""
+        key = (pos, holes, pist)
+        found = self._contact_cache.get(key)
+        if found is None:
+            found = tuple(self._find_contacts(pos, holes, pist))
+            if len(self._contact_cache) > 50_000:
+                self._contact_cache.clear()
+            self._contact_cache[key] = found
+        return found
+
+    def _find_contacts(self, pos, holes, pist):
         occ = self._occupancy(pos, holes, pist)
         holder = {c: P for P, (_, c) in zip(self.pistons, pist) if c >= 0}
         bodies, pdir = self.bodies, self.pdir
@@ -623,7 +635,19 @@ class Model:
 
     def touching(self, s, cell):
         """[(body, face code)] of the faces next to cell, as the demon standing there meets
-        them."""
+        them. Cached per position, holes and pistons."""
+        key = (s.pos, s.holes, s.pist)
+        cells = self._touch_cache.get(key)
+        if cells is None:
+            if len(self._touch_cache) > 20_000:
+                self._touch_cache.clear()
+            cells = self._touch_cache[key] = {}
+        out = cells.get(cell)
+        if out is None:
+            out = cells[cell] = self._touching(s, cell)
+        return out
+
+    def _touching(self, s, cell):
         occ = self.occupancy(s)
         out = []
         for i, (dx, dy) in enumerate(DIRS):
