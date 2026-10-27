@@ -9,7 +9,7 @@ pauses until it is back; holding F8 stops it. Nothing reads the game itself, so 
 level was solved is for the person watching to say.
 """
 import json, os, time
-from . import sim, solver, store
+from . import sim, solver, store, world
 
 GAME_EXE = "maxwell's_demon.exe"
 KEY = {'L': 'A', 'D': 'S', 'R': 'D', 'U': 'W'}
@@ -38,10 +38,15 @@ def actions(levels, lid, plan, ctx=None):
     """[(key, kind, extra)] for a plan: key 'W'/'A'/'S'/'D'/'E'/'Q'; kind 'move', 'win', 'enter'
     or 'quit'; extra the number of extra piston steps after a move. Raises ValueError when the
     plan does not replay."""
-    sv = solver.Solver(levels)
-    w = sv.world
+    w = world.World(levels)
     kw = store.solve_kwargs(ctx or {})
     h = w.start(kw.get('scope') or lid, kw.get('solved', frozenset()), kw.get('t_out', sim.NEUTRAL))
+    return replay(w, h, plan, lambda h: not h.path or w.finished(h, lid))[0]
+
+
+def replay(w, h, plan, done):
+    """Play plan from world state h until done(state) holds after a move (done None: to the
+    end of the plan). Returns (actions as in actions(), the state reached)."""
     out = []
     for step in store.unflatten(plan) if isinstance(plan, str) else plan:
         if isinstance(step, str):
@@ -50,10 +55,10 @@ def actions(levels, lid, plan, ctx=None):
                 h = w.step(h, sim.DIR_NAMES.index(letter))
                 if h is None:
                     raise ValueError(f'the plan does not replay: move {len(out) + 1} is impossible')
-                done = not h.path or w.finished(h, lid)
-                out.append((KEY[letter], 'win' if done else 'move', m.last_extra))
-                if done:
-                    return out
+                finished = done is not None and done(h)
+                out.append((KEY[letter], 'win' if finished else 'move', m.last_extra))
+                if finished:
+                    return out, h
         elif step[0] == 'enter':
             h = w.enter(h, sim.DIR_NAMES.index(step[1]))
             out.append(('E', 'enter', 0))
@@ -62,7 +67,59 @@ def actions(levels, lid, plan, ctx=None):
             out.append(('Q', 'quit', 0))
         if h is None:
             raise ValueError('the plan does not replay')
+    if done is None:
+        return out, h
     raise ValueError('the plan does not solve the level')
+
+
+def tour(levels, hub, todo, plans, solved, budget=20, log=None):
+    """Visit the levels of todo from the start of level hub (a world map): get to each one's
+    block (a search, as world maps are puzzles too, and they reset whenever a level is left),
+    enter it, play its plan; solving brings the demon back out next to the block. Only
+    unambiguous entries are used (world.World.unambiguous). plans: {lid: plan}; solved: the
+    levels taken as solved (the game's save); budget: seconds per search. Returns
+    [(lid, actions)] for the levels played, and [(lid, reason)] for the rest."""
+    sv = solver.Solver(levels, time_budget=budget)
+    w = sv.world
+    w.unambiguous = True
+    h = w.start(hub, solved)
+    out, skipped = [], []
+    for n, lid in enumerate(todo, 1):
+        if log:
+            log(f'[{n}/{len(todo)}] {lid}')
+        m = w.current(h)
+        bi = m.real_block.get(lid)
+        if bi is None:
+            skipped.append((lid, 'its block is not on this map'))
+            continue
+
+        def arrived(x, lid=lid):
+            return len(x.path) == 2 and x.path[-1].lid == lid
+
+        def near(x, bi=bi):  # walking distance, roughly: guides the search to the block
+            if len(x.path) != 1:
+                return 1
+            p = x.top.pos[bi] or m.initial_pos[bi]
+            return abs(x.top.demon[0] - p[0]) + abs(x.top.demon[1] - p[1])
+        w.enter_only = lid  # entering and leaving another level only resets the map
+        try:
+            r = sv.solve(hub, solved, start=h, goal=arrived, heuristic=near)
+        except (TimeoutError, RuntimeError):
+            r = None
+        finally:
+            w.enter_only = None
+        if r is None:
+            skipped.append((lid, 'no way found to enter it'))
+            continue
+        try:
+            acts, inside = replay(w, h, r[0], None)
+            played, after = replay(w, inside, plans[lid], lambda x: len(x.path) < len(inside.path))
+        except (ValueError, world.Unenterable) as e:
+            skipped.append((lid, str(e)))
+            continue
+        out.append((lid, acts + played))
+        h = after
+    return out, skipped
 
 
 def schedule(acts, t=None):

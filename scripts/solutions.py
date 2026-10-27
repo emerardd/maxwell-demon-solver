@@ -5,13 +5,15 @@ Usage:
   solutions.py verify LEVEL [PLAN]    mark LEVEL's best plan (or PLAN) as passed in the game
   solutions.py play LEVEL [--dry]     press the keys of LEVEL's best plan in the running game
                                       (mdemon/play.py); --dry only prints them
+  solutions.py tour WORLD [--dry]     play the numbered and lettered levels of WORLD one after
+                                      the other from the start of its map, walking between them
   solutions.py tas LEVEL [FILE]       write a script for WYXkk/Maxwell-s-TAS-demon (default
                                       solutions/tas/<name>_<id>.txt)
   solutions.py import LEVEL FILE      add the plan of a walkthrough written by show_solution.py
 LEVEL is an internal id or a name as in the list (w4-16, "w4-3 提示", ...). The game directory
 comes from MXW_GAME_DIR, else the default Steam location.
 """
-import os, re, sys, time
+import json, os, re, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from mdemon import catalog, mxw, play, solver, store
 
@@ -144,6 +146,77 @@ def cmd_play(args):
         print(f'{name} {lid}: {info["moves"]} 步的解法标为游戏内已通过')
 
 
+def subtree(node):
+    ids = {node['id']}
+    for k in ('normalSublevels', 'extraSublevels', 'metaSublevels', 'hintSublevels'):
+        for ch in node.get(k, []):
+            ids |= subtree(ch)
+    return ids
+
+
+def cmd_tour(args):
+    levels, structure, labels = game()
+    world = args[0]
+    node = catalog.find(structure['root'], catalog.WORLDS[world])
+    db = store.load()
+    todo, plans = [], {}
+    for k in ('normalSublevels', 'extraSublevels'):
+        for ch in node.get(k, []):
+            entry = db.get(ch['id'])
+            if entry and entry['plans']:
+                plan, info = store.best(entry)
+                if not info['ctx']:  # plans needing another context cannot be toured
+                    todo.append(ch['id'])
+                    plans[ch['id']] = plan
+    # The route is planned once per set of plans and kept in solutions/tours/<world>.json.
+    # The save is taken to have every level of the world solved, so the map looks as in the game.
+    cache = os.path.join(store.ROOT, 'solutions', 'tours', f'{world}.json')
+    segments = skipped = None
+    if os.path.exists(cache):
+        with open(cache, encoding='utf-8') as f:
+            kept = json.load(f)
+        if kept['plans'] == plans:
+            segments = [(lid, [tuple(a) for a in acts]) for lid, acts in kept['segments']]
+            skipped = [tuple(s) for s in kept['skipped']]
+            print(f'用缓存的路线 {cache}')
+    if segments is None:
+        segments, skipped = play.tour(levels, node['id'], todo, plans, frozenset(subtree(node)),
+                                      log=lambda line: print('  规划 ' + line, flush=True))
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        with open(cache, 'w', encoding='utf-8') as f:
+            json.dump({'plans': plans, 'segments': segments, 'skipped': skipped}, f,
+                      ensure_ascii=False, indent=1)
+    for lid, why in skipped:
+        print(f'跳过 {labels.get(lid, lid)} {lid}：{why}')
+    sched = [play.schedule(acts) for _, acts in segments]
+    total = sum(w for s in sched for _, w in s) / 1000
+    print(f'{world}：连播 {len(segments)} 关，共 {sum(len(s) for s in sched)} 键，约 {total / 60:.1f} 分钟')
+    for n, (lid, acts) in enumerate(segments, 1):
+        print(f'  {n:2}. {labels.get(lid, lid):8} {lid}  {len(acts)} 键')
+    if '--dry' in args or not segments:
+        return
+    player = play.Player()
+    print(f'请在游戏里进入 {world}，停在世界地图的起点（游戏存档里 {world} 要已经全部解开），'
+          '然后切到游戏窗口。检测到游戏在前台后 3 秒开始；中途切走会暂停，按住 F8 停止。')
+    if not player.wait_for_game(print):
+        sys.exit('60 秒内没有切到游戏窗口，已取消')
+    for i in (3, 2, 1):
+        print(f'{i}...', flush=True)
+        time.sleep(1)
+    finished = 0
+    for n, ((lid, acts), s) in enumerate(zip(segments, sched), 1):
+        print(f'[{n}/{len(segments)}] {labels.get(lid, lid)} {lid}', flush=True)
+        if player.play(s, log=lambda line: None) < len(s):
+            print(f'在第 {n} 关 {labels.get(lid, lid)} 中途停止')
+            break
+        finished = n
+    answer = input(f'已播完 {finished} 关。从第几关开始出错？（输入序号；回车 = 这 {finished} 关全部通过） ').strip()
+    good = finished if not answer else max(0, min(finished, int(answer) - 1))
+    for lid, _ in segments[:good]:
+        store.verify(lid, plans[lid])
+    print(f'{good} 关标为游戏内已通过')
+
+
 def cmd_import(args):
     levels, structure, labels = game()
     lid = resolve(args[0], levels, labels)
@@ -158,6 +231,6 @@ def cmd_import(args):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2 or sys.argv[1] not in ('list', 'verify', 'play', 'tas', 'import'):
+    if len(sys.argv) < 2 or sys.argv[1] not in ('list', 'verify', 'play', 'tour', 'tas', 'import'):
         sys.exit(__doc__)
     globals()['cmd_' + sys.argv[1]](sys.argv[2:])

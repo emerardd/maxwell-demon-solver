@@ -57,6 +57,10 @@ class World:
     def __init__(self, levels, weight='cell', max_depth=6):
         self.levels, self.weight, self.max_depth = levels, weight, max_depth
         self.depth_hit = False  # set when max_depth refused an entry
+        # Only enter a level block when it is the only one next to the demon: the game enters
+        # the lowest-numbered of several, an order not modelled. Set for playing in the game.
+        self.unambiguous = False
+        self.enter_only = None  # a level id: no other level can be entered (getting to it)
         self.models = {}
         self.parent = {}        # level id -> level holding its real block
         for lv in levels.values():
@@ -156,7 +160,14 @@ class World:
         bi = m.front_body(s, cell, d)
         if bi is None:
             return None
+        if self.unambiguous:
+            near = {m.front_body(s, (s.demon[0] + dx, s.demon[1] + dy), i)
+                    for i, (dx, dy) in enumerate(sim.DIRS)}
+            if sum(1 for b in near if b is not None and m.bodies[b].level_id) > 1:
+                return None
         lid = m.bodies[bi].level_id
+        if self.enter_only is not None and lid != self.enter_only and len(h.path) == 1:
+            return None
         if not lid or lid not in self.levels:
             return None
         chain = self.chain(h.path[0].lid, lid)

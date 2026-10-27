@@ -321,6 +321,19 @@ class Transitions(unittest.TestCase):  # w3 texts
         hit = w.current(h).occupancy(h.top).get(cell)
         return hit and hit[0]
 
+    def test_unambiguous_entering_refuses_two_blocks_at_once(self):  # for playing in the game
+        # the demon touches A (right) and B (below); the game would pick one by its number
+        w = self.make(top=(['#######',
+                            '#.@A..#',
+                            '#.B...#',
+                            '#######'], {'A': 'a', 'B': 'b'}),
+                      a=(self.EMPTY, None), b=(self.EMPTY, None))
+        h = w.start('top')
+        self.assertIsNotNone(w.enter(h, R))
+        w.unambiguous = True
+        self.assertIsNone(w.enter(h, R))
+        self.assertIsNone(w.enter(h, D))
+
     def test_quit_comes_out_where_it_went_in_and_resets_everything(self):  # exit-1, exit-2
         w = self.make(P=(['#######',
                           '#@.A..#',
