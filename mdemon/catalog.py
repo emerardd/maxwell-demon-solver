@@ -62,6 +62,17 @@ def labels(structure):
         for hub in node.get('hintSublevels', []):
             for i, ch in enumerate(hub.get('hintSublevels', []), 1):
                 out.setdefault(ch['id'], f'{world} 教程 {i}')
+
+    def nested(n):  # levels inside named levels: 'w3-5 / 2', 'w3-5 / B', 'w3-5 / 提示'
+        for k, tag in (('normalSublevels', None), ('extraSublevels', 'letter'), ('hintSublevels', '提示')):
+            kids = n.get(k, [])
+            for i, ch in enumerate(kids, 1):
+                if ch['id'] not in out and n['id'] in out:
+                    sub = str(i) if tag is None else chr(64 + i) if tag == 'letter' else                         tag if len(kids) == 1 else f'{tag} {i}'
+                    out[ch['id']] = f'{out[n["id"]]} / {sub}'
+                nested(ch)
+    for world in WORLDS:
+        nested(find(structure['root'], WORLDS[world]))
     return out
 
 

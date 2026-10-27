@@ -1,4 +1,212 @@
 {
+ "00ab1e70": {
+  "plans": {
+   "LDDLULURRRRURRRRDDDRRULDLURRULLLLULLLDDLLLURRURDRURRRRDDDLURRRULLLLULLLDDLLLURURDDLDRURRURD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 91,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "029cc92d": {
+  "plans": {
+   "LUURRDRRDLDLUULUURRRDULLLDRURDDLDDRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 36,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "02d5488b": {
+  "plans": {
+   "RRUU[EU]RDDRRRRUU[EU][Q]DDL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0398558e": {
+  "plans": {
+   "RURDLDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 9,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0505bc69": {
+  "plans": {
+   "RRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 5,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "056bf21e": {
+  "plans": {
+   "DDLLLRRURRRRRULLLDLLDLL[EU]RRUULULLDRDURRDRDDLL[EU]UURDRDLDLULL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 57,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "09321303": {
+  "plans": {
+   "U[EU][Q]UURUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 8,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0a054df7": {
+  "plans": {
+   "LUURUR[ED][Q]RDL[EL]DR[ER]LU[EU][Q]UU[EU]RURRDLLD[EL]UURURRDLLUL[EU]LDRRRRUR[ED]ULURRRURD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 61,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0cbbd26e": {
+  "plans": {
+   "RRRRRRRRRRRRRRRUURR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0d1cc9a5": {
+  "plans": {
+   "RRRRRRRRRUURRRRDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0d33f295": {
+  "plans": {
+   "RRD[ER]RRRR[ER]LLDDLLULLDRRR[ER]RRRR[ER]LLDD[ER]LLDDLL[EL][Q]RRRU[EL][Q]LLLRR[EU][Q][Q]UUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 58,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0ed3e8d9": {
+  "plans": {
+   "RRRRRRRRRRRUURDRRURULDDLULURRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 31,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "0ff63b2a": {
+  "plans": {
+   "RDRRRULLLDRRDDLLL[EU]LLURURDURRDRDDLL[EU]RRDRUUUURRUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 47,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "10279832": {
+  "plans": {
+   "RURURRDRRDLLLLULULLDD[ER]RRRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 28,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "138362d7": {
+  "plans": {
+   "LUR[EU]LUUURDDLDRRRRRUUUDDD[ER]RRUUUURR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 33,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "13b17116": {
+  "plans": {
+   "RURRDLLUUURDLDLLURRURDDLLLDRDRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 33,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
  "1405c8dd": {
   "plans": {
    "LLLDRRRDDRRUDLLUUURURRDLULLDDDDRRUUDDLLURRLLUUURDLDRUURDDLDDRRLLUURDLDR": {
@@ -14,6 +222,175 @@
    "LLLDRRRDDRRUDLLUUURURRDLULLDDDDRRUUDDLLURRLLUUURDLDRUURDDLDDRRLLUURDLDR": "2026-10-27"
   }
  },
+ "1435f49f": {
+  "plans": {
+   "RURRRRURRDLLLLDLDLLURRLURDDRRRLLLUURRRURRDLLLLLDDRULURRRRRLLLLLDLLURRRRRURRDLLLLDDRRDRRULLLLULLDRRRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 102,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "146c40ae": {
+  "plans": {
+   "RRDDLDDRUUU[EU]RRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 15,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "179d924b": {
+  "plans": {
+   "DRRLUURRURDLLDDDRUULUURDDLDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 30,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "17a16888": {
+  "plans": {
+   "RURDDRDRRRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 11,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "1819343f": {
+  "plans": {
+   "R": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 1,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "186acc62": {
+  "plans": {
+   "RRUURRRRDLLLLDD[ED]RRRRRRRRRRRRRUUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 32,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "187f3f61": {
+  "plans": {
+   "RRURDDDULLLDDRRLLUURRRRRRDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 27,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "18cd4530": {
+  "plans": {
+   "RDDRRDRRULLLRRR[ER]RDDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 20,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "192f2ce1": {
+  "plans": {
+   "RRRRULRRLLDLURULDDLLUUDRURRUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 29,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "1a39e7fd": {
+  "plans": {
+   "RR[ER]RRRDRRULLRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 15,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "1bfecdfb": {
+  "plans": {
+   "RRRRD[ER]RRDRRRRULULDRDLLRR[ED]RRRRD[ER]RRDULLRRD[ER]RRDRRR[ED]RRRRDDRRULDLURRULDLU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 68,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "1e097d06": {
+  "plans": {
+   "LLURURDLDRRDRDDRLUULUURDLDRURRRUUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 34,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "1e5e4e88": {
+  "plans": {
+   "RRURRRRRRULL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 12,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
  "1e9b113b": {
   "plans": {
    "DRDDRRDDRURULLLLDLLURDRUUULUURDLDRDDRRRRRRURULDDLLULLDLLUURRUURRDDDRRRDLLLLLLRUULLDD": {
@@ -21,7 +398,8 @@
     "found": "2026-10-27",
     "moves": 84,
     "sources": [
-     "import w1-12_1e9b113b.txt"
+     "import w1-12_1e9b113b.txt",
+     "run_world"
     ]
    }
   },
@@ -44,6 +422,279 @@
    "DRRRUUURRDRLULLDDDLLLLDRDRULURRR": "2026-10-27"
   }
  },
+ "215c0725": {
+  "plans": {
+   "RRDRRRURULDDLLLURRDRUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 22,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "225c6ca1": {
+  "plans": {
+   "RUURDLDRDRURRLUURD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 18,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "22f32079": {
+  "plans": {
+   "DRRULURDRURRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 13,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "234f8893": {
+  "plans": {
+   "RUUDRDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 9,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "247ca53d": {
+  "plans": {
+   "LUURURDLDDRRRUURRRRURDDLDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 27,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "26632a3d": {
+  "plans": {
+   "R": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 1,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "28f2d0c3": {
+  "plans": {
+   "RRURDLLDDRRLURUURU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 18,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "2f1eb8ad": {
+  "plans": {
+   "DRRLUURDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 10,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "31015a8c": {
+  "plans": {
+   "ULURRRURDD[EL]R": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 12,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "31a6bcbf": {
+  "plans": {
+   "RRRRRDRRURULLLLLLLDLLUUUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 25,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "3610e77a": {
+  "plans": {
+   "RDDLLLDLDRRUURRDULLDDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 22,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "36121d69": {
+  "plans": {
+   "RRURRDULLDRURDLDDRLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 21,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "3805ab78": {
+  "plans": {
+   "RRURRDRRDD[ER]URUR[ED][Q]LDRUR[EU]RRURLDDRD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 32,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "394c69e4": {
+  "plans": {
+   "RRRRDRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 7,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "39887920": {
+  "plans": {
+   "DR[ER]RURRRDLL[EL]RRRRDR[EU][Q]D": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 21,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "3ab049f0": {
+  "plans": {
+   "LULDRDRRRRULLLLULDLDDDRULURRRRUURDDRDDDLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 41,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "3b80a1f9": {
+  "plans": {
+   "LDLUURRRRDDLDUUULDDDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 22,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "3d384b9e": {
+  "plans": {
+   "RURDLDRRURRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 12,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "3de2408c": {
+  "plans": {
+   "RR[ED]RRRDDRRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 11,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "42db5cae": {
+  "plans": {
+   "RDRULURDDRULURRLLURDRLURDRLDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 31,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "44efd75a": {
+  "plans": {
+   "RR[ER]R[ER]RR[ER]RRRRDRU[Q][ER]RRRRDRRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 27,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
  "4b1153be": {
   "plans": {
    "DRRRRULLDLUUDRRRUULLLDLLURRRRRRLLLLDRRRDRULLLLLLDRRRRDRULURDRRRRRU": {
@@ -60,6 +711,578 @@
    "DRRRRULLDLUUDRRRUULLLDLLURRRRRRLLLLDRRRDRULLLLLLDRRRRDRULURDRRRRRU": "2026-10-27"
   }
  },
+ "4d2742e3": {
+  "plans": {
+   "RRURDLDRRRUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 12,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "4e6fb743": {
+  "plans": {
+   "RUURRRRRRULULDRDLLLLUULDLDDDRULURUURRRDLULLDRRRRRURRDDUULDRDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 61,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "4eabc8cb": {
+  "plans": {
+   "DRRRRRURU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 9,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "4ec5a1d7": {
+  "plans": {
+   "DRR[EU][Q][Q]LUURDDLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 15,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "4ef69548": {
+  "plans": {
+   "RRDRULURDDRRRUULDRDLUUUULL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 26,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "523a87ff": {
+  "plans": {
+   "DRRRURRUUURURRDLLULDDDRDLLRR[ER]DRRRUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 35,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "5272ab97": {
+  "plans": {
+   "UUURDRDRDLLLDLURULDRRRULDLLURRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 32,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "52b20c5f": {
+  "plans": {
+   "RRRRRRRRRUURRDRULUURLDRDDRRRUULRDDLLLUUURDDLDRRLUURRDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 54,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "5531cf85": {
+  "plans": {
+   "DRRRRULLLRRR[ER][EL][Q]LLDLUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 21,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "58266cf4": {
+  "plans": {
+   "RR[ER]DRRRRULLRRUR[ED]DRURULDLUDLDDRUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 32,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "58e14d99": {
+  "plans": {
+   "DDDRLUUUUURDRLDRLDDRURLURRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 27,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "5b40101b": {
+  "plans": {
+   "LLLDLLLLURRRRRRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 18,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "5f7b9492": {
+  "plans": {
+   "LULDLDRURRRURRDLLD[EL]LLDRDRUDRRUU[EL]RDDRUURUU[EL]RURUUUL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 49,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "5ff09ca0": {
+  "plans": {
+   "LDRLUURURDDLDDRRRRRDRRUUUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 26,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "612e58c2": {
+  "plans": {
+   "LLUURURDDRRRLDDRURRRRRUUULDLDLLLLRDDLUULLLUUURRRDLLRDDLU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 56,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "621419ea": {
+  "plans": {
+   "RRDRRDRUUDRULLUURDLDDLLUURLDDRRURUULDDRDL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 41,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "68628547": {
+  "plans": {
+   "RRURRRRDRD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 10,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "68ae7592": {
+  "plans": {
+   "LRRRRURDLLLDRRRRRURRDLLLLULLLURDRLDRRRRURRRUULDRDLLRDLUULRDDLU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 62,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "6d50f9a6": {
+  "plans": {
+   "RRR[EU]RRDDLDDRUUU[EU]RRR[EU]RRDD[ED][Q]DLDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 31,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "6e66dc79": {
+  "plans": {
+   "LLDRRDRULUURULRUULDRDDLDDRUUUULURLDDDRDDDRURULULUDLLURUURDDLLLDDRRLDDRUUUULUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 77,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "6ef12bf9": {
+  "plans": {
+   "UUR[EU]RR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 6,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "6f80647e": {
+  "plans": {
+   "LDLULURLUURDRURDLLLDRRRDRULURDDRRLLLLDDDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 41,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "709dcc60": {
+  "plans": {
+   "DRRRRULLRR[ER]DRURULDLU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 20,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "755cf487": {
+  "plans": {
+   "DLDDDULLDDRRUURRDDLLLRUULLDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 28,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "76314e4f": {
+  "plans": {
+   "LLUURRURDDLDRRRRURRURLUUUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 26,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7885951d": {
+  "plans": {
+   "DDLDRRRRRUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 11,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "79c615b0": {
+  "plans": {
+   "DRRRRURULLDLUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 14,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7c0f20e3": {
+  "plans": {
+   "LLLURDRRULDLLURRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7c1d7402": {
+  "plans": {
+   "LDDDDRULURURURRDRRULLLLDLDDRUULLURURDRRDRRULLLLULLDRURDDDLDDRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 64,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7c529bb7": {
+  "plans": {
+   "RUURDRDLLRRU[ER]LDRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7c7ab348": {
+  "plans": {
+   "DRRLUURDRLDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 14,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7d76ebbf": {
+  "plans": {
+   "RRRRRRRRRRRUURURDLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 20,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7dc8d0b7": {
+  "plans": {
+   "RRDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 4,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "7f6f9979": {
+  "plans": {
+   "RRRURRDLLLLLULDULLDRRRRRRURRDLLLLULDLLDRRURRLLDRRLLLDDRRUDLLUURURRRURRDDLRUULLDDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 81,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "806cab3d": {
+  "plans": {
+   "LDDDRULURDRRULLRRU[EL][Q]LLDLRUULLDRURDDLDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 40,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "84f5a19a": {
+  "plans": {
+   "LLLDRR[ER]RRRDDUULLD[EL]DD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 20,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "872bef8e": {
+  "plans": {
+   "DRRDDRRRULDLLLLLUURRRDULLLDDRRRRURDLLULULUUURDDLDRLLDRRURDLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 61,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "88eebe0c": {
+  "plans": {
+   "RRRDRRULL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 9,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "8a3ae7ac": {
+  "plans": {
+   "RRRDLRRRULLLLLDDLDDRUURRUURRDDDLURULDLLUDLLURURRURDLDULLDDRULURRRRURDDDLUULLDRDDRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 84,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "8a9bc86e": {
+  "plans": {
+   "RRRRRRRRRRRRRRRRRRUURDRULUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 27,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "8b0f5e34": {
+  "plans": {
+   "RRRRRRRRRRRRRRRRRRRRRUURRLLUUURURDDDLDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 40,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "8b4b138d": {
+  "plans": {
+   "LLDDRRRRUUURRDULLDDDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 23,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "8ffac265": {
+  "plans": {
+   "RRLDRRULLURDRRRRDRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "9078c4bd": {
+  "plans": {
+   "RRDRRR[EU]ULURRRURDD[EL]RDLUDLLLUURR[ER][Q]RRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 35,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
  "93c8cbea": {
   "plans": {
    "RURRDLLULDLDRRRRRRURDLDR": {
@@ -74,6 +1297,266 @@
   "verified": {
    "RURRDLLULDLDRRRRRRURDLDR": "2026-10-27"
   }
+ },
+ "97f3453f": {
+  "plans": {
+   "LRRRUUULDD[ED]RRURDRRRULLLULDRDLD[ER]RURRDLLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 39,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "9990717e": {
+  "plans": {
+   "UUURRDDDUUULLDDDDRRLLDDRRRRUUDDLLLLUURRUURRLLUURRRRDDUULLLLDDRRRLLLUURRRRDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 75,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "a679896b": {
+  "plans": {
+   "DRRLURRRRRDRRRURRRRUUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 22,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "a742df19": {
+  "plans": {
+   "URURRDRRDRURULLLLLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "aa258f4c": {
+  "plans": {
+   "DUULDDDRRRRRLLLUUUURDLLLURRDRRURRDRULUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 39,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "aa7076fe": {
+  "plans": {
+   "LDDRURRUURRDLLLULDLDRRRURRDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 28,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "ab7435ad": {
+  "plans": {
+   "R": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 1,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "acd2d224": {
+  "plans": {
+   "URURRRRDRDRDDLURULLLULULLLLDDURRR[ED]URRRRDLULL[ED]URRRDLLULDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 56,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "ae651e2b": {
+  "plans": {
+   "DLLLDRURRRDDLLDDRRUDLLUULULLDRRUURRDDLLULDDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 44,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "afa7e406": {
+  "plans": {
+   "RRRRRRRRRURUURRDRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 19,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "b016124e": {
+  "plans": {
+   "LDDRDRURLUDDRRUUDLLLUURRDDDRRRRUUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 34,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "b2442882": {
+  "plans": {
+   "RRRRRRRRRRRRRRRRRRRRUUURURDLDDRUULUURUUL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 40,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "b2d1b7fb": {
+  "plans": {
+   "RRUR[ED]RD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 7,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "b6c54242": {
+  "plans": {
+   "RRRRRDDDRRULDLUUULURURDDURRDLULDLDRLDDRULUURURRDLULDDLDLDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 59,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "b8fe6e90": {
+  "plans": {
+   "DRRRRRURULUDDDLLLLUURLUUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 25,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "b9f2b2e0": {
+  "plans": {
+   "RURR[ED]RR[ED]RRRDDRRURRDLLU[EU]RURRRDLLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 32,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "bbabb211": {
+  "plans": {
+   "RRRURDRDLLDLLDDRUULUURLDDRULURRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 33,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "be98d49b": {
+  "plans": {
+   "DRRRRLURRRRDRRULLLLLLLLLLLDRRRUULLLUDDL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 39,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c126c493": {
+  "plans": {
+   "RRURDDLULLDDRRRUUURRRDDLDLLLLLULD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 33,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c1dac57c": {
+  "plans": {
+   "RRRRRRRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 8,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
  },
  "c27d4c92": {
   "plans": {
@@ -90,6 +1573,188 @@
    "LDDRURRRULUURRDLLULDLDDRLURRRDRRRRRUUULDLLDULDRURRRDLLLULLLLLDDDR": "2026-10-27"
   }
  },
+ "c53d6cb8": {
+  "plans": {
+   "RRRRRRRRUURDRRRRRUULDRDLULDLLLURURDLDRUURU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 42,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c6caf002": {
+  "plans": {
+   "LDLLURRRDRURULLLDLLURRRRDRUU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 28,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c6f422c4": {
+  "plans": {
+   "LDDRDRULUURURRRURRDLLLLLDLLURDRLDDRRUDLLUURLDRLUURRRRURRDDDLRUUULLDRURDDDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 74,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c868ad46": {
+  "plans": {
+   "RRRRR[ER]RRDR[EU]RRULLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 17,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "c8d64998": {
+  "plans": {
+   "LLLUUURURDRURRDLLLULDDLDRUURDLDDRDRUUUUDDDLUUUULURRRLLDRRRDRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 61,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "cd58f7ab": {
+  "plans": {
+   "DRR[EU][Q][Q]LUURDDLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 15,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "cde11a5c": {
+  "plans": {
+   "RRURDLDRRRURU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 13,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "cde27355": {
+  "plans": {
+   "RRURDLDRURRD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 12,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "dd77699c": {
+  "plans": {
+   "URRRRULULDRDLLRRRR[EU]U": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 20,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "df02ce93": {
+  "plans": {
+   "RURDDRDDLLDLLURRDRUURULRUULDDDDUUULLDRURDDRDLLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 47,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "df7293f8": {
+  "plans": {
+   "RR[ER]RURR[ED]RR[ED]RRRDDRRURRDLLU[EU]RURRRDLLLLURRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 40,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "dfc1b4a6": {
+  "plans": {
+   "RRURDDDDRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 10,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "e80e6019": {
+  "plans": {
+   "RRLLLUURURDDLDDRRRUDLLLURRURRRRRRRDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 36,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "e8bb4801": {
+  "plans": {
+   "LDDRRRLLDDDRRUUDRRUULDDLLUUDDRRUULDDLLLUUUURRDDLLDDRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 55,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
  "eadb3d02": {
   "plans": {
    "RRRRRRRRRUURRRDRLUURDRRU": {
@@ -104,5 +1769,200 @@
   "verified": {
    "RRRRRRRRRUURRRDRLUURDRRU": "2026-10-27"
   }
+ },
+ "ebe70e73": {
+  "plans": {
+   "RRRRDLDRLUULLDDRLUURRDRDDRRULDLUUDDLLLURDRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 43,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "ee8a7350": {
+  "plans": {
+   "LDDDR[EU][Q]UURUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 12,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f094349a": {
+  "plans": {
+   "LRRURRURDURRDDDLURULLLLRRDD[EL]LUURDD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 34,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f0b9a001": {
+  "plans": {
+   "RRRRURDLDRURD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 13,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f11ee95d": {
+  "plans": {
+   "LDDDLLULURDDRRUUDDLLUURLDDRRUURUDLLURDRURUDLLLLDDRDRUULURURDRURUDLLUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 69,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f1461519": {
+  "plans": {
+   "RRRRDDLURULLLULDLDRRURRDULLDRURDDRDDLRDL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 40,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f3419f4e": {
+  "plans": {
+   "RRURUULDDDULLLDRDRUULUURDDRRULURR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 33,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f8464e0d": {
+  "plans": {
+   "RUL[EU]LUUURDDRDL[EL]RRRRRU": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 21,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f87c4aa3": {
+  "plans": {
+   "RRRURRRULDRDDLURUULDDULLDR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 26,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f9ab0810": {
+  "plans": {
+   "UDLLLURRDDDDRURULLLRUUULDLDRLUUUURRRRDDDDDLUULLDRURRDLRRURRDDDDLLUUUUDLLDDLDLLUUURURURDRUUDLLLLUURRRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 103,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "f9cecf9e": {
+  "plans": {
+   "RRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 3,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "fc2f60dd": {
+  "plans": {
+   "D[ED]RRURRURRDLLL[EL]RR[EU][Q]UURUR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 24,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "fc564c81": {
+  "plans": {
+   "RURRDRRDRULURRRRRURD": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 20,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "fd2517e8": {
+  "plans": {
+   "DRRRRULLDLLLU[EL]RLLUURDLDRRRRR": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 28,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
+ },
+ "fd69ab34": {
+  "plans": {
+   "RRRRRRRDDRRUUDDLLUURDDRRRUUUULLDDDDDDRRDDLL": {
+    "ctx": {},
+    "found": "2026-10-27",
+    "moves": 43,
+    "sources": [
+     "run_world"
+    ]
+   }
+  },
+  "verified": {}
  }
 }
