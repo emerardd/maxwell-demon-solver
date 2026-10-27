@@ -72,6 +72,29 @@ def replay(w, h, plan, done):
     raise ValueError('the plan does not solve the level')
 
 
+def walk_to(w, h, bi):
+    """Plain walking on the current level (nothing pushed, never burnt) to a cell from which
+    the demon enters body bi with E and nothing else: [moves + ('enter', d)], or None.
+    Temperatures may still settle on the way (a map's start is not always in equilibrium);
+    the caller replays the walk through the rules."""
+    from collections import deque
+    m = w.current(h)
+    seen, queue = {h.top.demon: ''}, deque([h.top])
+    while queue:
+        s = queue.popleft()
+        for d, (dx, dy) in enumerate(sim.DIRS):
+            cell = (s.demon[0] + dx, s.demon[1] + dy)
+            if m.front_body(s, cell, d) == bi and w._entry(h._replace(top=s), d) is not None:
+                return ([seen[s.demon]] if seen[s.demon] else []) + [('enter', sim.DIR_NAMES[d])]
+        for i in range(4):
+            n = m.step(s, i)
+            if n is None or n.pos != s.pos or n.demon_temp == sim.HOT or n.demon in seen:
+                continue
+            seen[n.demon] = seen[s.demon] + sim.DIR_NAMES[i]
+            queue.append(n)
+    return None
+
+
 def tour(levels, hub, todo, plans, solved, budget=20, log=None):
     """Visit the levels of todo from the start of level hub (a world map): get to each one's
     block (a search, as world maps are puzzles too, and they reset whenever a level is left),
@@ -83,36 +106,52 @@ def tour(levels, hub, todo, plans, solved, budget=20, log=None):
     w = sv.world
     w.unambiguous = True
     h = w.start(hub, solved)
+    m = w.current(h)
     out, skipped = [], []
-    for n, lid in enumerate(todo, 1):
-        if log:
-            log(f'[{n}/{len(todo)}] {lid}')
-        m = w.current(h)
-        bi = m.real_block.get(lid)
-        if bi is None:
+    left = []
+    for lid in todo:
+        if m.real_block.get(lid) is None:
             skipped.append((lid, 'its block is not on this map'))
-            continue
+        else:
+            left.append(lid)
 
-        def arrived(x, lid=lid):
+    def route(lid, search):
+        """Moves from h into lid: a plain walk, or with search a solver plan. None if none."""
+        bi = m.real_block[lid]
+
+        def arrived(x):
             return len(x.path) == 2 and x.path[-1].lid == lid
 
-        def near(x, bi=bi):  # walking distance, roughly: guides the search to the block
+        def near(x):  # walking distance, roughly: guides the search to the block
             if len(x.path) != 1:
                 return 1
             p = x.top.pos[bi] or m.initial_pos[bi]
             return abs(x.top.demon[0] - p[0]) + abs(x.top.demon[1] - p[1])
         w.enter_only = lid  # entering and leaving another level only resets the map
         try:
+            if not search:
+                return walk_to(w, h, bi)
             r = sv.solve(hub, solved, start=h, goal=arrived, heuristic=near)
+            return r and r[0]
         except (TimeoutError, RuntimeError):
-            r = None
+            return None
         finally:
             w.enter_only = None
-        if r is None:
-            skipped.append((lid, 'no way found to enter it'))
-            continue
+
+    # Greedy order: the next level is one a plain walk away from where the last one came out,
+    # in the game's order; only when there is none, one the search can get to.
+    while left:
+        found = next(((lid, r) for lid in left if (r := route(lid, False))), None) or \
+            next(((lid, r) for lid in left if (r := route(lid, True))), None)
+        if found is None:
+            skipped += [(lid, 'no way found to enter it') for lid in left]
+            break
+        lid, moves = found
+        left.remove(lid)
+        if log:
+            log(f'[{len(out) + 1}/{len(todo)}] {lid}')
         try:
-            acts, inside = replay(w, h, r[0], None)
+            acts, inside = replay(w, h, moves, None)
             played, after = replay(w, inside, plans[lid], lambda x: len(x.path) < len(inside.path))
         except (ValueError, world.Unenterable) as e:
             skipped.append((lid, str(e)))

@@ -5,8 +5,10 @@ Usage:
   solutions.py verify LEVEL [PLAN]    mark LEVEL's best plan (or PLAN) as passed in the game
   solutions.py play LEVEL [--dry]     press the keys of LEVEL's best plan in the running game
                                       (mdemon/play.py); --dry only prints them
-  solutions.py tour WORLD [--dry]     play the numbered and lettered levels of WORLD one after
-                                      the other from the start of its map, walking between them
+  solutions.py tour WORLD [--dry] [--budget S]
+                                      play the numbered and lettered levels of WORLD one after
+                                      the other from the start of its map, walking between them;
+                                      S: seconds per search for the way to a block (default 20)
   solutions.py tas LEVEL [FILE]       write a script for WYXkk/Maxwell-s-TAS-demon (default
                                       solutions/tas/<name>_<id>.txt)
   solutions.py import LEVEL FILE      add the plan of a walkthrough written by show_solution.py
@@ -181,6 +183,7 @@ def cmd_tour(args):
             print(f'用缓存的路线 {cache}')
     if segments is None:
         segments, skipped = play.tour(levels, node['id'], todo, plans, frozenset(subtree(node)),
+                                      budget=float(args[args.index('--budget') + 1]) if '--budget' in args else 20,
                                       log=lambda line: print('  规划 ' + line, flush=True))
         os.makedirs(os.path.dirname(cache), exist_ok=True)
         with open(cache, 'w', encoding='utf-8') as f:
