@@ -13,7 +13,7 @@ Set MXW_GAME_DIR to also run the data tests against the installed game.
 """
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import mxw, prune, sim, solver, store, world
+from mdemon import mxw, play, prune, sim, solver, store, world
 from mdemon.sim import HOT, COLD, NEUTRAL
 
 L, D, R, U = range(4)
@@ -804,6 +804,29 @@ class Store(unittest.TestCase):  # solutions/db.json, here on a temporary file
         self.assertEqual(list(entry['verified']), ['RRRR'])
         store.record('x', 'RR', source='d', path=self.path)  # found again: one plan, two sources
         self.assertEqual(store.load(self.path)['x']['plans']['RR']['sources'], ['c', 'd'])
+
+
+class Playback(unittest.TestCase):  # mdemon/play.py, without sending any key
+    def test_piston_step_and_win_get_their_waits(self):
+        # walking right sets off the hot piston, which pushes its block onto the goal
+        level = build(['#######',
+                       '#...*.#',
+                       '#@....#',
+                       '#######'])
+        hot = mxw.Block(6, sum(c << (2 * i) for i, c in enumerate((P, P, I, P))))
+        level.grid[1][3] = mxw.Piston(2, hot, 0, block())
+        acts = play.actions({'test': level}, 'test', 'R')
+        self.assertEqual(acts, [('D', 'win', 1)])
+        t = dict(play.TIMING)
+        self.assertEqual(play.schedule(acts, t), [('D', t['win'] + t['piston'])])
+        self.assertEqual(play.tas_text(acts), ['dp-'])
+
+    def test_plan_that_does_not_replay_is_refused(self):
+        level = build(['#####',
+                       '#@.*#',
+                       '#####'])
+        with self.assertRaises(ValueError):
+            play.actions({'test': level}, 'test', 'LL')
 
 
 class SubGoals(unittest.TestCase):

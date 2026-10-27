@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 solutions/db.json.lock
 solutions/db.json.tmp
+timing.json

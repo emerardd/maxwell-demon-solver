@@ -3,19 +3,20 @@
 Usage:
   solutions.py list [WORLD]           best plan per level, and whether it was checked in the game
   solutions.py verify LEVEL [PLAN]    mark LEVEL's best plan (or PLAN) as passed in the game
+  solutions.py play LEVEL [--dry]     press the keys of LEVEL's best plan in the running game
+                                      (mdemon/play.py); --dry only prints them
   solutions.py tas LEVEL [FILE]       write a script for WYXkk/Maxwell-s-TAS-demon (default
                                       solutions/tas/<name>_<id>.txt)
   solutions.py import LEVEL FILE      add the plan of a walkthrough written by show_solution.py
 LEVEL is an internal id or a name as in the list (w4-16, "w4-3 提示", ...). The game directory
 comes from MXW_GAME_DIR, else the default Steam location.
 """
-import os, re, sys
+import os, re, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mdemon import catalog, mxw, sim, solver, store, world
+from mdemon import catalog, mxw, play, solver, store
 
 GAME = os.environ.get('MXW_GAME_DIR',
                       r"D:\Program Files (x86)\Steam\steamapps\common\Maxwell's puzzling demon")
-KEY = {'L': 'a', 'D': 's', 'R': 'd', 'U': 'w'}
 ARROW = {'←': 'L', '↓': 'D', '→': 'R', '↑': 'U'}
 
 
@@ -80,37 +81,6 @@ def cmd_verify(args):
     print(f'{labels.get(lid, lid)} {lid}: {store.moves(plan)} 步的解法标为游戏内已通过')
 
 
-def tas_lines(levels, lid, plan_text, ctx):
-    """The plan as TAS text, replayed through the rules to know where pistons move."""
-    sv = solver.Solver(levels)
-    w = sv.world
-    kw = store.solve_kwargs(ctx)
-    h = w.start(kw.get('scope') or lid, kw.get('solved', frozenset()), kw.get('t_out', sim.NEUTRAL))
-    out = []
-    for step in store.unflatten(plan_text):
-        if isinstance(step, str):
-            for letter in step:
-                m = w.current(h)
-                h = w.step(h, sim.DIR_NAMES.index(letter))
-                if h is None:
-                    raise ValueError(f'plan does not replay at {letter}')
-                out.append(KEY[letter] + 'p' * m.last_extra)
-                if not h.path or w.finished(h, lid):
-                    out.append('-')
-                    return out
-        elif step[0] == 'enter':
-            h = w.enter(h, sim.DIR_NAMES.index(step[1]))
-            out.append(f'e  # 进入{"左下右上"[sim.DIR_NAMES.index(step[1])]}边的关卡块\n')
-        else:
-            if out:
-                out[-1] = out[-1][0].upper() + out[-1][1:]  # the move before quitting waits longer
-            h = w.quit(h)
-            out.append('q\n')
-        if h is None:
-            raise ValueError('plan does not replay')
-    return out
-
-
 def cmd_tas(args):
     levels, structure, labels = game()
     lid = resolve(args[0], levels, labels)
@@ -121,7 +91,7 @@ def cmd_tas(args):
     name = labels.get(lid, lid)
     path = args[1] if len(args) > 1 else os.path.join(
         store.ROOT, 'solutions', 'tas', f'{name.replace(" ", "_")}_{lid}.txt')
-    keys = tas_lines(levels, lid, plan, info['ctx'])
+    keys = play.tas_text(play.actions(levels, lid, plan, info['ctx']))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
         f.write(f'# {name} ({lid}), {info["moves"]} moves, for WYXkk/Maxwell-s-TAS-demon\n')
@@ -139,6 +109,41 @@ def cmd_tas(args):
     print(f'{name} {lid}: {info["moves"]} 步 -> {path}')
 
 
+def cmd_play(args):
+    levels, structure, labels = game()
+    lid = resolve(args[0], levels, labels)
+    entry = store.load().get(lid)
+    if not entry:
+        sys.exit(f'no plan stored for {lid}')
+    plan, info = store.best(entry)
+    name = labels.get(lid, lid)
+    acts = play.actions(levels, lid, plan, info['ctx'])
+    sched = play.schedule(acts)
+    total = sum(w for _, w in sched) / 1000
+    pistons = sum(e for _, _, e in acts)
+    print(f'{name} {lid}: {len(sched)} 键（活塞额外动作 {pistons} 次），约 {total:.0f} 秒')
+    if info['ctx']:
+        print(f'注意：这条解法要从特定上下文开始：{info["ctx"]}')
+    if '--dry' in args:
+        print(' '.join(f'{k}{w}' for k, w in sched))
+        return
+    player = play.Player()
+    print('请切到游戏窗口，进入这一关并停在起点。检测到游戏窗口在前台后 3 秒开始；'
+          '中途切走会暂停，按住 F8 停止。')
+    if not player.wait_for_game(print):
+        sys.exit('60 秒内没有切到游戏窗口，已取消')
+    for i in (3, 2, 1):
+        print(f'{i}...', flush=True)
+        time.sleep(1)
+    sent = player.play(sched)
+    if sent < len(sched):
+        return
+    answer = input('游戏里过关了吗？(y/N) ').strip().lower()
+    if answer == 'y':
+        store.verify(lid, plan)
+        print(f'{name} {lid}: {info["moves"]} 步的解法标为游戏内已通过')
+
+
 def cmd_import(args):
     levels, structure, labels = game()
     lid = resolve(args[0], levels, labels)
@@ -153,6 +158,6 @@ def cmd_import(args):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2 or sys.argv[1] not in ('list', 'verify', 'tas', 'import'):
+    if len(sys.argv) < 2 or sys.argv[1] not in ('list', 'verify', 'play', 'tas', 'import'):
         sys.exit(__doc__)
     globals()['cmd_' + sys.argv[1]](sys.argv[2:])
