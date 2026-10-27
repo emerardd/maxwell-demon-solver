@@ -21,6 +21,7 @@ TIMING = {
     'win': 1400,      # after the move that solves the level
     'enter': 650,     # after entering a level
     'quit': 400,      # after quitting a level
+    'reset': 300,     # after resetting the current level (R)
     'before_quit': 60,  # extra after the move before a quit (quitting is refused earlier)
 }
 
@@ -35,8 +36,9 @@ def timing():
 
 
 def actions(levels, lid, plan, ctx=None):
-    """[(key, kind, extra)] for a plan: key 'W'/'A'/'S'/'D'/'E'/'Q'; kind 'move', 'win', 'enter'
-    or 'quit'; extra the number of extra piston steps after a move. Raises ValueError when the
+    """[(key, kind, extra)] for a plan: key 'W'/'A'/'S'/'D'/'E'/'Q' (and 'R' in tours); kind
+    'move', 'win', 'enter', 'quit' (or 'reset'); extra the number of extra piston steps after a
+    move. Raises ValueError when the
     plan does not replay."""
     w = world.World(levels)
     kw = store.solve_kwargs(ctx or {})
@@ -102,7 +104,7 @@ def tour(levels, hub, todo, plans, solved, budget=20, log=None):
     unambiguous entries are used (world.World.unambiguous). plans: {lid: plan}; solved: the
     levels taken as solved (the game's save); budget: seconds per search. Returns
     [(lid, actions)] for the levels played, and [(lid, reason)] for the rest."""
-    sv = solver.Solver(levels, time_budget=budget)
+    sv = solver.Solver(levels, time_budget=budget, h_weight=3)  # any way there will do
     w = sv.world
     w.unambiguous = True
     h = w.start(hub, solved)
@@ -115,7 +117,7 @@ def tour(levels, hub, todo, plans, solved, budget=20, log=None):
         else:
             left.append(lid)
 
-    def route(lid, search):
+    def route(lid, search, h):
         """Moves from h into lid: a plain walk, or with search a solver plan. None if none."""
         bi = m.real_block[lid]
 
@@ -138,25 +140,56 @@ def tour(levels, hub, todo, plans, solved, budget=20, log=None):
         finally:
             w.enter_only = None
 
+    def visit(lid, moves, h, reset):
+        """(actions, state after coming back out) of walking in from h and playing lid's
+        plan; reset: press R first (h is then the map's start)."""
+        acts, inside = replay(w, h, moves, None)
+        played, after = replay(w, inside, plans[lid], lambda x: len(x.path) < len(inside.path))
+        return [('R', 'reset', 0)] * reset + acts + played, after
+
     # Greedy order: the next level is one a plain walk away from where the last one came out,
-    # in the game's order; only when there is none, one the search can get to.
+    # or else from the map's start after resetting it (R: the demon can get shut in, w2);
+    # preferring the one that leaves most of the others a plain walk away (the map resets on
+    # every exit, so that only depends on where the demon comes out), in the game's order on
+    # ties. Only when no level is a walk away, one the search can get to, likewise.
+    fresh = h
     while left:
-        found = next(((lid, r) for lid in left if (r := route(lid, False))), None) or \
-            next(((lid, r) for lid in left if (r := route(lid, True))), None)
-        if found is None:
+        starts = [(h, False)] + ([(fresh, True)] if h.top != fresh.top else [])
+        best = None
+        for frm, reset in starts:
+            for lid in list(left):
+                moves = route(lid, False, frm)
+                if not moves:
+                    continue
+                try:
+                    acts, after = visit(lid, moves, frm, reset)
+                except (ValueError, world.Unenterable) as e:
+                    skipped.append((lid, str(e)))
+                    left.remove(lid)
+                    continue
+                reach = sum(1 for o in left if o != lid and route(o, False, after))
+                if best is None or reach > best[0]:
+                    best = (reach, lid, acts, after)
+            if best:
+                break
+        for frm, reset in starts if best is None else ():
+            found = next(((lid, r) for lid in left if (r := route(lid, True, frm))), None)
+            if found:
+                try:
+                    acts, after = visit(*found, frm, reset)
+                    best = (0, found[0], acts, after)
+                    break
+                except (ValueError, world.Unenterable) as e:
+                    skipped.append((found[0], str(e)))
+                    left.remove(found[0])
+        if best is None:
             skipped += [(lid, 'no way found to enter it') for lid in left]
             break
-        lid, moves = found
+        _, lid, acts, after = best
         left.remove(lid)
         if log:
             log(f'[{len(out) + 1}/{len(todo)}] {lid}')
-        try:
-            acts, inside = replay(w, h, moves, None)
-            played, after = replay(w, inside, plans[lid], lambda x: len(x.path) < len(inside.path))
-        except (ValueError, world.Unenterable) as e:
-            skipped.append((lid, str(e)))
-            continue
-        out.append((lid, acts + played))
+        out.append((lid, acts))
         h = after
     return out, skipped
 
