@@ -117,12 +117,15 @@ class Solver:
         return None
 
     def _h(self, h):
-        """Push-distance bound while in the level being solved (INF marks a dead state).
-        Anywhere else at least one more step is needed, and nothing is pruned."""
+        """Push-distance bound while in the level being solved (INF marks a dead state);
+        in piston levels the guidance of prune.Pruner.piston instead. Anywhere else at least
+        one more step is needed, and nothing is pruned."""
         if len(h.path) == 1 and h.path[0].lid == self.target:
             m = self.world.current(h)
             if self.heuristic == 'informed':
                 return self.pruner.informed(m, h.top)
+            if m.pistons:  # the relaxed tables are no bound there anyway
+                return self.pruner.piston(m, h.top)
             return self.pruner.h(m, h.top)
         return 1
 

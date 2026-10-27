@@ -167,6 +167,59 @@ class Pruner:
         t = self.tables(m)
         return min([t.cap] + [c[0] for c in self._candidates(m, s, t)])
 
+    def piston(self, m, s):
+        """Guidance for piston levels, used there instead of h() (not admissible): push distance as in h(), plus, for the
+        best candidate, the walk from the nearest piston to where the demon would have to stand
+        for the first push on its route that the demon cannot make: that cell is a wall, or the
+        block is hot and conducts towards it. Some piston has to push there instead."""
+        t = self.tables(m)
+        best, extra = INF, 0
+        for d, table, origin, shape, members in self._candidates(m, s, t):
+            if d >= best + 1:  # only near-best candidates are worth the route walk
+                continue
+            cost = self._piston_cost(m, s, t, table, origin, shape, members)
+            if d + cost < best + extra:
+                best, extra = d, cost
+        if best == INF:
+            return min(t.cap, INF)
+        return min(t.cap, best + extra) if t.cap < INF else best + extra
+
+    def _piston_cost(self, m, s, t, table, origin, shape, members):
+        hot = any(s.temp[j] == HOT for j in members)
+        o, d = origin, table[origin]
+        while d > 0:
+            for i, (dx, dy) in enumerate(DIRS):
+                nxt = (o[0] + dx, o[1] + dy)
+                if table.get(nxt) == d - 1:
+                    break
+            else:
+                return 0
+            cells = set(shape)
+            for k, (cx, cy) in enumerate(shape):
+                if (cx - dx, cy - dy) in cells:
+                    continue
+                behind = (o[0] + cx - dx, o[1] + cy - dy)
+                blocked = not m.inside(behind) or behind in t.static
+                burning = hot and m.bodies[members[0]].faces[0][OPP[i]] != INSULATED
+                if blocked or burning:
+                    return self._nearest_piston(m, s, t, behind)
+            o, d = nxt, d - 1
+        return 0
+
+    @staticmethod
+    def _nearest_piston(m, s, t, cell):
+        best = INF
+        for P in m.pistons:
+            p = s.pos[P]
+            if p is None:
+                continue
+            for i, (dx, dy) in enumerate(DIRS):  # stand next to the cell, or on it
+                c = (cell[0] + dx, cell[1] + dy)
+                if m.inside(c) and c not in t.static:
+                    best = min(best, t.walk(m, c).get(p, INF) + 1)
+            best = min(best, t.walk(m, cell).get(p, INF) if m.inside(cell) and cell not in t.static else INF)
+        return 0 if best == INF else best
+
     OBSTACLE = 3   # informed heuristic: per movable group standing on the candidate's route
     HAZARD = 4     # per hot body that would burn the demon at a push position on the route
     NO_COLD = 10   # a hazard and no cold block anywhere: cooling is not an option
