@@ -60,7 +60,7 @@ python -m unittest discover -s tests
 
 `solve_one.py`、`run_world.py`、`run_tutorials.py`、`run_extras.py`、`show_solution.py`、`bench.py` 解出并回放成功的解法，都会自动存进 `solutions/db.json`（`mdemon/store.py`）。同一关的所有不同解法都会保留下来，步数最少的就是最优解。在游戏里照着走通以后，用 `solutions.py verify` 标记，标记跟着那一条具体的解法走；以后找到更短的解时，列表会显示"旧解已通过，最优解未验证"。
 
-`solutions.py play` 直接在游戏里回放最优解（`mdemon/play.py`，只支持 Windows）：先在规则模拟里回放一遍，知道每一键之后活塞要多动几次、是不是过关或进出关卡，据此决定每一键之后等多久。只有游戏窗口（`Maxwell's_demon.exe`）在前台时才发按键，中途切走会自动暂停，按住 F8 停止。播放完会问是否过关，回答 y 就标为游戏内已通过。等待时间的默认值在 `play.TIMING`，可以在仓库根目录建一个 `timing.json` 覆盖（不进仓库），加 `--dry` 则只打印按键和等待时间。
+`solutions.py play` 直接在游戏里回放最优解（`mdemon/play.py`，只支持 Windows）：先在规则模拟里回放一遍，知道每一键之后活塞要多动几次、是不是过关或进出关卡，据此决定每一键之后等多久。只有游戏窗口（`Maxwell's_demon.exe`）在前台时才发按键，中途切走会自动暂停，按住 F8 停止。播放完会问是否过关，回答 y 就标为游戏内已通过。等待时间的默认值在 `play.TIMING`，可以在仓库根目录建一个 `timing.json` 覆盖（不进仓库），加 `--dry` 则只打印按键和等待时间。默认等待时间已在游戏里实测可用（w4-16，65 键，含一次活塞动作）。
 
 `solutions.py tas` 把最优解导出成 [WYXkk/Maxwell-s-TAS-demon](https://github.com/WYXkk/Maxwell-s-TAS-demon) 的脚本，放在 `solutions/tas/`。它会在规则模拟里回放一遍，每次有活塞额外动作就补一个 `p`，过关后补 `-`。脚本从关卡起点开始，所以要先手动进入关卡。用法：用 C++ 编译器编译那个项目的 `tas.cpp`，旁边放一个写着各按键等待时间的 `interval.txt`（格式见它的 README），运行后输入脚本路径，3 秒内切回游戏窗口；按住 `t` 可以中途停止。含进入关卡的解法里，`e` 的朝向还没核对过。
 
